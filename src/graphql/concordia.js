@@ -12,7 +12,6 @@ export const GET_COMPLAINTS = gql`
       is_anonymous
       status
       createdAt
-      updatedAt
     }
   }
 `
@@ -46,7 +45,7 @@ export const RESOLVE_COMPLAINT = gql`
     resolveComplaint(id: $id) {
       id
       status
-      updatedAt
+      createdAt
     }
   }
 `
