@@ -29,13 +29,18 @@ The frontend **never** calls service-domus (:3001), service-labor (:3002), or an
 
 ### Data flow
 
-- **Apollo Client** (`src/lib/apolloClient.js`) handles all GraphQL calls.
+- **Apollo Client** (`src/lib/apolloClient.js`) handles all GraphQL calls, with `credentials: 'include'` so the gateway's `httpOnly` auth cookie rides along automatically — there's no auth link or manual header.
 - **Socket.io-client** connects to `:3003` for real-time notifications, wired in
-  `src/context/SocketContext.jsx`.
-- **Authentication**: JWT stored in `localStorage` under the `sodalis_token` key. The token must
-  be replaced after `createColoc` and `joinColoc` mutations — both return a new token with an
-  updated `coloc_id`. `src/lib/apolloClient.js` reads it via an Apollo auth link (`setContext`)
-  and sends it as `Authorization: Bearer <token>` on every request.
+  `src/context/SocketContext.jsx`, also with `withCredentials: true`. It listens for a single
+  `notification` event — room isolation (per coloc / per user) is enforced server-side by
+  `service-concordia`, not by the event name.
+- **Authentication**: the JWT lives in an `httpOnly` cookie set by the gateway — the frontend
+  never reads or stores it. `AuthContext` (`src/context/AuthContext.jsx`) rehydrates "who's
+  logged in" via the `me` GraphQL query on mount (the only way to know, since the cookie is
+  invisible to JS) and exposes a `loading` flag consumers should gate on. `login`/`register`/
+  `createColoc`/`joinColoc` call `refreshUser()` (re-runs `me`) instead of decoding a returned
+  token — none of those mutations return one anymore. `logout` calls the `logout` mutation
+  (server-side revocation) before clearing local Apollo state.
 
 ### Routing & layout
 
