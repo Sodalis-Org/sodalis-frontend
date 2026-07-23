@@ -6,8 +6,10 @@
 //
 //   node scripts/check-contrast.mjs
 //
-// Seuils RGAA 3.2 / WCAG 1.4.3 : 4,5:1 pour le texte normal, 3:1 pour le
-// texte large (>= 24px, ou >= 19px en gras).
+// Seuils RGAA 3.2 : 4,5:1 pour le texte normal (WCAG 1.4.3), 3:1 pour le
+// texte large (>= 24px, ou >= 19px en gras) ou pour un composant d'interface
+// / objet graphique non-décoratif (WCAG 1.4.11) — ex. une icône seule dans
+// un bouton, sans texte visible à côté.
 
 // Valeurs hexadécimales de la palette Tailwind par défaut (v3), pour les
 // teintes réellement utilisées dans le dépôt.
@@ -70,24 +72,31 @@ function contrast(hexA, hexB) {
 // liste complète des lignes concernées par chaque correction).
 const COMBOS = [
   // Texte gris clair sur fond blanc/quasi-blanc — le cas le plus répandu
-  // (états vides, sous-titres, timestamps, emails) : ~40 occurrences dans
-  // src/components/NotificationDrawer.jsx, src/pages/{Dashboard,Domus,Labor,Concordia,Onboarding}/index.jsx.
-  { file: 'src/pages/Dashboard/index.jsx:195 (et 40 occurrences similaires)', fg: 'gray-400', bg: 'white', largeText: false },
+  // (états vides, sous-titres, timestamps, emails) : ~40 occurrences,
+  // corrigées en text-gray-600 dans src/components/NotificationDrawer.jsx et
+  // src/pages/{Dashboard,Domus,Labor,Concordia,Onboarding}/index.jsx.
+  { file: 'text-gray-400 sur blanc, ~40 occurrences — corrigé en text-gray-600', fg: 'gray-600', bg: 'white', largeText: false },
 
-  // Badge "Annulé" / bouton suppression option de sondage
-  { file: 'src/pages/Domus/index.jsx:33 (badge CANCELLED)', fg: 'red-400', bg: 'red-50', largeText: false },
-  { file: 'src/pages/Concordia/index.jsx:341 (bouton suppression option sondage)', fg: 'red-400', bg: 'red-50', largeText: false },
+  // Badge "Annulé" / bouton suppression option de sondage — corrigés en text-red-700
+  { file: 'src/pages/Domus/index.jsx:35 (badge CANCELLED)', fg: 'red-700', bg: 'red-50', largeText: false },
+  { file: 'src/pages/Concordia/index.jsx:315 (bouton suppression option sondage, icône seule)', fg: 'red-700', bg: 'red-50', largeText: false },
 
-  // Autres combinaisons de badges/pastilles trouvées par grep
-  { file: 'src/pages/Domus/index.jsx:216-218 (Badge par défaut)', fg: 'gray-500', bg: 'gray-100', largeText: false },
-  { file: 'src/pages/Domus/index.jsx:65 (compteur TabBar)', fg: 'gray-500', bg: 'gray-200', largeText: false },
-  { file: 'src/components/NotificationDrawer.jsx:248 (statut hors-ligne)', fg: 'gray-400', bg: 'gray-100', largeText: false },
-  { file: 'src/components/NotificationDrawer.jsx:128,134 (boutons refresh/close)', fg: 'gray-500', bg: 'gray-50', largeText: false },
-  { file: 'src/components/NotificationDrawer.jsx:199 (bouton "Charger plus")', fg: 'gray-600', bg: 'gray-50', largeText: false },
+  // Onglets inactifs (TabBar) et badges texte sur fond gris — corrigés en text-gray-600
+  { file: 'src/pages/Domus/index.jsx:60 / src/pages/Labor/index.jsx:319 / src/pages/Concordia/index.jsx:598 (onglet inactif)', fg: 'gray-600', bg: 'gray-100', largeText: false },
+  { file: 'src/pages/Domus/index.jsx:67 (compteur TabBar)', fg: 'gray-600', bg: 'gray-200', largeText: false },
+  { file: 'src/pages/Domus/index.jsx:189-190 (Badge, valeur de secours) / :288 (badge "Membre")', fg: 'gray-600', bg: 'gray-100', largeText: false },
+  { file: 'src/pages/Concordia/index.jsx:363 (badge "Fermé" d\'un sondage)', fg: 'gray-600', bg: 'gray-100', largeText: false },
+
+  // Icônes seules (pas de texte visible à côté) : seuil non-texte 3:1 — déjà
+  // conformes, aucune correction nécessaire (RGAA 3.2 ne s'applique au seuil
+  // 4,5:1 qu'au texte, pas aux objets graphiques).
+  { file: 'src/pages/Domus/index.jsx:177 (icône de catégorie, TicketCard)', fg: 'gray-500', bg: 'gray-100', nonText: true },
+  { file: 'src/pages/Concordia/index.jsx:178 (bouton suppression plainte, icône Trash2 seule)', fg: 'red-600', bg: 'red-50', nonText: true },
+
+  { file: 'src/components/NotificationDrawer.jsx:140,147 (boutons refresh/close, icônes seules)', fg: 'gray-500', bg: 'gray-50', nonText: true },
+  { file: 'src/components/Modal.jsx (croix de fermeture, icône seule)', fg: 'gray-500', bg: 'gray-100', nonText: true },
   { file: 'src/pages/Concordia/index.jsx:115 (SelectField, texte anonyme)', fg: 'gray-700', bg: 'gray-50', largeText: false },
-  { file: 'src/pages/Concordia/index.jsx:218 (bouton suppression plainte résolue)', fg: 'gray-400', bg: 'gray-50', largeText: false },
-  { file: 'src/pages/Concordia/index.jsx:209 (bouton suppression plainte)', fg: 'red-600', bg: 'red-50', largeText: false },
-  { file: 'src/pages/Onboarding/index.jsx:44 (ErrorBanner) / src/pages/Domus/index.jsx:162 (alerte URGENT)', fg: 'red-700', bg: 'red-50', largeText: false },
+  { file: 'src/pages/Onboarding/index.jsx:44 (ErrorBanner) / src/pages/Domus/index.jsx:136 (alerte URGENT)', fg: 'red-700', bg: 'red-50', largeText: false },
   { file: 'src/pages/Dashboard/index.jsx:23 / src/pages/Domus/index.jsx:26 (priorité URGENT)', fg: 'red-700', bg: 'red-100', largeText: false },
   { file: 'src/pages/Dashboard/index.jsx:24 / src/pages/Domus/index.jsx:25 (priorité HIGH)', fg: 'orange-700', bg: 'orange-100', largeText: false },
   { file: 'src/pages/Dashboard/index.jsx:25 / src/pages/Domus/index.jsx:24 (priorité MEDIUM)', fg: 'yellow-700', bg: 'yellow-100', largeText: false },
@@ -107,12 +116,12 @@ const COMBOS = [
 ]
 
 let hasFailure = false
-for (const { file, fg, bg, largeText } of COMBOS) {
+for (const { file, fg, bg, largeText, nonText } of COMBOS) {
   const ratio = contrast(PALETTE[fg], PALETTE[bg])
-  const threshold = largeText ? 3 : 4.5
+  const threshold = largeText || nonText ? 3 : 4.5
   const pass = ratio >= threshold
   if (!pass) hasFailure = true
-  console.log(`${ratio.toFixed(2)}:1  ${pass ? 'PASS' : 'FAIL'}  text-${fg} sur bg-${bg}  (seuil ${threshold}:1)  — ${file}`)
+  console.log(`${ratio.toFixed(2)}:1  ${pass ? 'PASS' : 'FAIL'}  text-${fg} sur bg-${bg}  (seuil ${threshold}:1${nonText ? ', objet non-texte' : ''})  — ${file}`)
 }
 
 if (hasFailure) {

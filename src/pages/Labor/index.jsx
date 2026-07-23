@@ -89,7 +89,7 @@ function CreateTaskModal({ onClose, onCreate, loading, error, members }) {
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="task-due-at" className="text-sm font-medium text-gray-700">
-            Date limite <span className="text-gray-400 font-normal">(optionnel)</span>
+            Date limite <span className="text-gray-600 font-normal">(optionnel)</span>
           </label>
           <div className="relative">
             <input
@@ -100,7 +100,7 @@ function CreateTaskModal({ onClose, onCreate, loading, error, members }) {
               min={new Date().toISOString().split('T')[0]}
               className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
-            <CalendarDays size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <CalendarDays size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
           </div>
         </div>
 
@@ -161,7 +161,7 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
         </button>
 
         <div className="flex-1 min-w-0">
-          <p className={clsx('text-sm font-semibold leading-snug', isDone ? 'line-through text-gray-400' : 'text-gray-900')}>
+          <p className={clsx('text-sm font-semibold leading-snug', isDone ? 'line-through text-gray-600' : 'text-gray-900')}>
             {task.title}
           </p>
           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
@@ -174,7 +174,7 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
               </div>
             )}
             {task.due_at && (
-              <div className={clsx('flex items-center gap-1 text-xs', overdue ? 'text-red-500 font-medium' : 'text-gray-400')}>
+              <div className={clsx('flex items-center gap-1 text-xs', overdue ? 'text-red-500 font-medium' : 'text-gray-600')}>
                 <Clock size={11} />
                 <span>{overdue && !isDone ? 'En retard · ' : ''}{formatDate(task.due_at)}</span>
               </div>
@@ -224,13 +224,13 @@ function TaskSection({ title, tasks, statusDot, emptyLabel, children }) {
       >
         <span className={clsx('w-2 h-2 rounded-full shrink-0', statusDot)} />
         <span className="text-sm font-semibold text-gray-600">{title}</span>
-        <span className="text-xs text-gray-400 font-medium">({tasks.length})</span>
-        <ChevronDown size={14} className={clsx('text-gray-400 ml-auto transition-transform', collapsed && '-rotate-90')} />
+        <span className="text-xs text-gray-600 font-medium">({tasks.length})</span>
+        <ChevronDown size={14} className={clsx('text-gray-600 ml-auto transition-transform', collapsed && '-rotate-90')} />
       </button>
 
       {!collapsed && (
         tasks.length === 0 ? (
-          <p className="text-xs text-gray-400 pl-4 py-2">{emptyLabel}</p>
+          <p className="text-xs text-gray-600 pl-4 py-2">{emptyLabel}</p>
         ) : (
           <div className="flex flex-col gap-2">{children}</div>
         )
@@ -295,7 +295,7 @@ export default function Labor() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-xl font-bold text-gray-900">Labor</h1>
-              <p className="text-xs text-gray-400 mt-0.5">Tâches &amp; corvées</p>
+              <p className="text-xs text-gray-600 mt-0.5">Tâches &amp; corvées</p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -316,7 +316,7 @@ export default function Labor() {
                 onClick={() => setActiveTab(tab.value)}
                 className={clsx(
                   'flex-1 py-2 rounded-xl text-sm font-medium transition-all',
-                  activeTab === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  activeTab === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'
                 )}
               >
                 {tab.label}
@@ -334,7 +334,7 @@ export default function Labor() {
           ].map(({ label, count, color }) => (
             <div key={label} className="bg-white py-3 flex flex-col items-center">
               <span className={clsx('text-xl font-bold', color)}>{count}</span>
-              <span className="text-xs text-gray-400">{label}</span>
+              <span className="text-xs text-gray-600">{label}</span>
             </div>
           ))}
         </div>

@@ -32,7 +32,7 @@ const TICKET_STATUSES = [
   { value: 'OPEN',        label: 'Ouvert',   color: 'bg-gray-100 text-gray-600'   },
   { value: 'IN_PROGRESS', label: 'En cours', color: 'bg-blue-100 text-blue-700'   },
   { value: 'RESOLVED',    label: 'Résolu',   color: 'bg-green-100 text-green-700' },
-  { value: 'CANCELLED',   label: 'Annulé',   color: 'bg-red-50 text-red-400'      },
+  { value: 'CANCELLED',   label: 'Annulé',   color: 'bg-red-50 text-red-700'      },
 ]
 
 const STATUS_TRANSITIONS = {
@@ -57,14 +57,14 @@ function TabBar({ tabs, active, onChange }) {
           onClick={() => onChange(tab.value)}
           className={clsx(
             'flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-all',
-            active === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            active === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'
           )}
         >
           <tab.Icon size={15} />
           {tab.label}
           {tab.count > 0 && (
             <span className={clsx('text-xs rounded-full px-1.5 py-0.5 font-semibold',
-              active === tab.value ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'
+              active === tab.value ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-600'
             )}>{tab.count}</span>
           )}
         </button>
@@ -105,7 +105,7 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="ticket-description" className="text-sm font-medium text-gray-700">
-            Description <span className="text-gray-400 font-normal">(optionnel)</span>
+            Description <span className="text-gray-600 font-normal">(optionnel)</span>
           </label>
           <textarea
             id="ticket-description"
@@ -186,8 +186,8 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Badge label={priority?.label ?? ticket.priority} color={priority?.color ?? 'bg-gray-100 text-gray-500'} />
-        <Badge label={status?.label ?? ticket.status}     color={status?.color   ?? 'bg-gray-100 text-gray-500'} />
+        <Badge label={priority?.label ?? ticket.priority} color={priority?.color ?? 'bg-gray-100 text-gray-600'} />
+        <Badge label={status?.label ?? ticket.status}     color={status?.color   ?? 'bg-gray-100 text-gray-600'} />
         <Badge label={cat?.label    ?? ticket.category}   color="bg-gray-100 text-gray-600" />
       </div>
 
@@ -275,9 +275,9 @@ function MembersTab({ members, currentUserId }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
-              {member.id === currentUserId && <span className="text-xs text-gray-400">(moi)</span>}
+              {member.id === currentUserId && <span className="text-xs text-gray-600">(moi)</span>}
             </div>
-            <p className="text-xs text-gray-400 truncate mt-0.5">{member.email}</p>
+            <p className="text-xs text-gray-600 truncate mt-0.5">{member.email}</p>
           </div>
           <div className="flex flex-col items-end gap-1.5 shrink-0">
             {member.role === 'ADMIN' ? (
@@ -285,7 +285,7 @@ function MembersTab({ members, currentUserId }) {
                 <ShieldCheck size={11} /> Admin
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-lg font-medium">
+              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">
                 <User size={11} /> Membre
               </span>
             )}
@@ -333,7 +333,7 @@ function MaintenanceTab({ tickets, members, isAdmin, onUpdateStatus, onAssign })
       {filtered.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
           <Wrench size={28} className="mx-auto text-gray-300 mb-2" />
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600">
             Aucun ticket {filter === 'active' ? 'actif' : filter === 'done' ? 'terminé' : ''}
           </p>
         </div>
@@ -417,7 +417,7 @@ export default function Domus() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-xl font-bold text-gray-900">Domus</h1>
-              <p className="text-xs text-gray-400 mt-0.5">Habitat &amp; maintenance</p>
+              <p className="text-xs text-gray-600 mt-0.5">Habitat &amp; maintenance</p>
             </div>
             {activeTab === 'maintenance' && (
               <button

@@ -86,7 +86,7 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
           <EyeOff size={16} className="shrink-0" />
           <div className="flex flex-col items-start">
             <span>Plainte anonyme</span>
-            <span className={clsx('text-xs font-normal', isAnonymous ? 'text-gray-300' : 'text-gray-400')}>
+            <span className={clsx('text-xs font-normal', isAnonymous ? 'text-gray-300' : 'text-gray-600')}>
               {isAnonymous ? 'Votre identité sera masquée définitivement' : 'Votre nom sera visible'}
             </span>
           </div>
@@ -135,7 +135,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
               <span className="text-xs font-medium text-gray-700">{creator.name}</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 text-xs text-gray-400">
+            <div className="flex items-center gap-1.5 text-xs text-gray-600">
               <User size={13} /> <span>Utilisateur supprimé</span>
             </div>
           )}
@@ -163,7 +163,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-400">{timeAgo(complaint.createdAt)}</span>
+        <span className="text-xs text-gray-600">{timeAgo(complaint.createdAt)}</span>
         {canAct && !isResolved && (
           <div className="flex items-center gap-2">
             <button
@@ -185,7 +185,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
           <button
             onClick={() => onDelete(complaint.id)}
             aria-label="Supprimer la plainte"
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-400 text-xs hover:bg-gray-100 transition"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-xs hover:bg-gray-100 transition"
           >
             <Trash2 size={13} />
           </button>
@@ -242,7 +242,7 @@ function ComplaintsTab({ complaints, members, currentUserId, isAdmin, onResolve,
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
             <MessageSquare size={28} className="mx-auto text-gray-300 mb-2" />
-            <p className="text-sm text-gray-400">Aucune plainte {filter === 'open' ? 'ouverte' : filter === 'resolved' ? 'résolue' : ''}</p>
+            <p className="text-sm text-gray-600">Aucune plainte {filter === 'open' ? 'ouverte' : filter === 'resolved' ? 'résolue' : ''}</p>
           </div>
         ) : (
           filtered.map((c) => (
@@ -295,7 +295,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-gray-700">Options <span className="text-gray-400 font-normal">(2–6)</span></span>
+          <span className="text-sm font-medium text-gray-700">Options <span className="text-gray-600 font-normal">(2–6)</span></span>
           {options.map((opt, i) => (
             <div key={i} className="flex gap-2">
               <label htmlFor={`${optionLabelId}-${i}`} className="sr-only">{`Option ${i + 1}`}</label>
@@ -312,7 +312,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
                   type="button"
                   onClick={() => removeOption(i)}
                   aria-label={`Supprimer l'option ${i + 1}`}
-                  className="w-10 h-10 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition shrink-0"
+                  className="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center hover:bg-red-100 transition shrink-0"
                 >
                   <X size={14} />
                 </button>
@@ -360,7 +360,7 @@ function PollCard({ poll, currentUserId, onVote }) {
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-semibold text-gray-900 leading-snug flex-1">{poll.question}</p>
         {isClosed ? (
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-gray-500 text-xs font-medium shrink-0">
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium shrink-0">
             <Lock size={11} /> Fermé
           </span>
         ) : (
@@ -418,7 +418,7 @@ function PollCard({ poll, currentUserId, onVote }) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="flex items-center justify-between text-xs text-gray-600">
         <span>{totalVotes} vote{totalVotes > 1 ? 's' : ''}</span>
         <span>{timeAgo(poll.createdAt)}</span>
       </div>
@@ -475,7 +475,7 @@ function PollsTab({ polls, currentUserId, onVote, onCreate, createLoading, error
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
             <BarChart2 size={28} className="mx-auto text-gray-300 mb-2" />
-            <p className="text-sm text-gray-400">Aucun sondage {filter === 'open' ? 'ouvert' : filter === 'closed' ? 'fermé' : ''}</p>
+            <p className="text-sm text-gray-600">Aucun sondage {filter === 'open' ? 'ouvert' : filter === 'closed' ? 'fermé' : ''}</p>
           </div>
         ) : (
           filtered.map((poll) => (
@@ -584,7 +584,7 @@ export default function Concordia() {
         <div className="bg-white border-b border-gray-100 px-4 pt-10 pb-4">
           <div className="mb-4">
             <h1 className="text-xl font-bold text-gray-900">Concordia</h1>
-            <p className="text-xs text-gray-400 mt-0.5">Social &amp; médiation</p>
+            <p className="text-xs text-gray-600 mt-0.5">Social &amp; médiation</p>
           </div>
 
           {/* Tab bar */}
@@ -595,7 +595,7 @@ export default function Concordia() {
                 onClick={() => setActiveTab(tab.value)}
                 className={clsx(
                   'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all',
-                  activeTab === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  activeTab === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'
                 )}
               >
                 <tab.Icon size={14} />

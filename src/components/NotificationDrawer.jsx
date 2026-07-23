@@ -129,7 +129,7 @@ export function NotificationDrawer({ open, onClose }) {
             <Bell size={18} className="text-indigo-600" />
             <h2 id={titleId} className="text-base font-bold text-gray-900">Notifications</h2>
             {unreadCount === 0 && liveNotifs.length > 0 && (
-              <span className="text-xs text-gray-400">(tout lu)</span>
+              <span className="text-xs text-gray-600">(tout lu)</span>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -156,7 +156,7 @@ export function NotificationDrawer({ open, onClose }) {
           {merged.length === 0 && !loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
               <Bell size={36} className="text-gray-200" />
-              <p className="text-sm text-gray-400">Aucune notification pour le moment.</p>
+              <p className="text-sm text-gray-600">Aucune notification pour le moment.</p>
               <p className="text-xs text-gray-300">Les événements de la colocation apparaîtront ici en temps réel.</p>
             </div>
           ) : (
@@ -189,9 +189,9 @@ export function NotificationDrawer({ open, onClose }) {
                       <p className="text-sm text-gray-800 leading-snug">{notif.message}</p>
                       <div className="flex items-center gap-2 mt-1">
                         {notif.type && (
-                          <span className="text-xs text-gray-400 font-mono">{notif.type}</span>
+                          <span className="text-xs text-gray-600 font-mono">{notif.type}</span>
                         )}
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-600">
                           {timeAgo(notif.created_at ?? notif.createdAt)}
                         </span>
                         {isLive && (
@@ -230,7 +230,7 @@ export function NotificationDrawer({ open, onClose }) {
         {/* Footer — total */}
         {pagination && (
           <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-gray-600 text-center">
               {pagination.total} notification{pagination.total > 1 ? 's' : ''} au total · page {page}/{Math.ceil(pagination.total / pagination.limit)}
             </p>
           </div>
@@ -258,7 +258,7 @@ function SocketStatus() {
 
   return (
     <div className={clsx('flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium',
-      connected ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'
+      connected ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-600'
     )}>
       {connected ? <Wifi size={11} /> : <WifiOff size={11} />}
       {connected ? 'Live' : 'Hors ligne'}

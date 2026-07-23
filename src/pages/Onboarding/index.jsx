@@ -201,7 +201,7 @@ function ColocStep() {
         <button
           type="button"
           onClick={logout}
-          className="text-center text-xs text-gray-400 hover:text-gray-600 transition mt-1"
+          className="text-center text-xs text-gray-600 hover:text-gray-700 transition mt-1"
         >
           Se déconnecter
         </button>
@@ -252,7 +252,7 @@ function ColocStep() {
       <button
         type="button"
         onClick={logout}
-        className="text-center text-xs text-gray-400 hover:text-gray-600 transition mt-1"
+        className="text-center text-xs text-gray-600 hover:text-gray-700 transition mt-1"
       >
         Se déconnecter
       </button>

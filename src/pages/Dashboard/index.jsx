@@ -62,7 +62,7 @@ function SectionHeader({ title, count }) {
     <div className="flex items-center justify-between mb-3">
       <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{title}</h2>
       {count !== undefined && (
-        <span className="text-xs font-medium text-gray-400">{count}</span>
+        <span className="text-xs font-medium text-gray-600">{count}</span>
       )}
     </div>
   )
@@ -121,7 +121,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <Avatar name={user?.name ?? ''} size="lg" />
             <div>
-              <p className="text-xs text-gray-400 font-medium">Bonjour,</p>
+              <p className="text-xs text-gray-600 font-medium">Bonjour,</p>
               <h1 className="text-lg font-bold text-gray-900 leading-tight">{user?.name ?? 'Colocataire'}</h1>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function Dashboard() {
           {myTasks.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
               <CheckSquare size={28} className="mx-auto text-gray-300 mb-2" />
-              <p className="text-sm text-gray-400">Aucune tâche assignée</p>
+              <p className="text-sm text-gray-600">Aucune tâche assignée</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -205,7 +205,7 @@ export default function Dashboard() {
                   </span>
                   <p className="text-sm font-medium text-gray-800 flex-1 min-w-0 truncate">{task.title}</p>
                   {task.due_at && (
-                    <div className="flex items-center gap-1 text-gray-400 shrink-0">
+                    <div className="flex items-center gap-1 text-gray-600 shrink-0">
                       <Clock size={12} />
                       <span className="text-xs">{new Date(task.due_at).toLocaleDateString('fr', { day: 'numeric', month: 'short' })}</span>
                     </div>
@@ -274,7 +274,7 @@ export default function Dashboard() {
           {notifications.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
               <Bell size={28} className="mx-auto text-gray-300 mb-2" />
-              <p className="text-sm text-gray-400">Aucune activité récente</p>
+              <p className="text-sm text-gray-600">Aucune activité récente</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -289,7 +289,7 @@ export default function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 leading-snug">{notif.message}</p>
                     {notif.created_at && (
-                      <p className="text-xs text-gray-400 mt-1">{timeAgo(notif.created_at)}</p>
+                      <p className="text-xs text-gray-600 mt-1">{timeAgo(notif.created_at)}</p>
                     )}
                   </div>
                 </div>

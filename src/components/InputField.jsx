@@ -28,7 +28,7 @@ export default function InputField({ label, type = 'text', value, onChange, plac
             type="button"
             onClick={() => setShow((s) => !s)}
             aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-600 hover:text-gray-700"
           >
             {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
