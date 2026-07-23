@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import {
   MessageSquare, BarChart2, Heart, Plus, X, Trash2,
-  CheckCircle, EyeOff, User, Target, Loader2,
+  CheckCircle, EyeOff, User, Target,
   AlertTriangle, Sparkles, Lock
 } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -10,6 +10,7 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
@@ -107,7 +108,7 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <><MessageSquare size={15} /> Déposer la plainte</>}
+          {loading ? <LoadingSpinner size={16} /> : <><MessageSquare size={15} aria-hidden="true" /> Déposer la plainte</>}
         </button>
       </form>
     </Modal>
@@ -342,7 +343,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <><BarChart2 size={15} /> Créer le sondage</>}
+          {loading ? <LoadingSpinner size={16} /> : <><BarChart2 size={15} aria-hidden="true" /> Créer le sondage</>}
         </button>
       </form>
     </Modal>
@@ -525,8 +526,8 @@ function KarmaTab({ members, currentUserId, onThank }) {
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 text-purple-600 text-xs font-semibold hover:bg-purple-100 disabled:opacity-50 transition"
             >
               {thankingId === member.id
-                ? <Loader2 size={13} className="animate-spin" />
-                : <><Heart size={13} /> Remercier</>
+                ? <LoadingSpinner size={13} />
+                : <><Heart size={13} aria-hidden="true" /> Remercier</>
               }
             </button>
           </div>
@@ -571,8 +572,9 @@ export default function Concordia() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 px-4 pt-4">
-        {[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
+      <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
+        <span className="sr-only">Chargement en cours</span>
+        {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
   }

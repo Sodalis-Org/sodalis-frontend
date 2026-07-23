@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { Home, LogIn, UserPlus, Key, Plus, AlertCircle, Loader2, Copy, Check } from 'lucide-react'
+import { Home, LogIn, UserPlus, Key, Plus, AlertCircle, Copy, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useAuthContext } from '../../context/AuthContext'
 import { useAuth } from '../../hooks/useAuth'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import InputField from '../../components/InputField'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
@@ -27,7 +28,7 @@ function PrimaryButton({ children, loading, disabled, type = 'submit', onClick }
       disabled={loading || disabled}
       className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
     >
-      {loading ? <Loader2 size={16} className="animate-spin" /> : children}
+      {loading ? <LoadingSpinner size={16} /> : children}
     </button>
   )
 }

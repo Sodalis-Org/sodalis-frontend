@@ -71,9 +71,10 @@ function SectionHeader({ title, count }) {
 
 function LoadingState() {
   return (
-    <div className="flex flex-col gap-3 px-4 pt-4">
+    <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
+      <span className="sr-only">Chargement en cours</span>
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
+        <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
       ))}
     </div>
   )

@@ -2,12 +2,13 @@ import { useState } from 'react'
 import {
   Plus, Clock, CheckCircle2, Circle,
   ArrowRight, RotateCcw, ChevronDown, AlertTriangle,
-  Loader2, Star, CalendarDays
+  Star, CalendarDays
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useLabor } from '../../hooks/useLabor'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
+import LoadingSpinner from '../../components/LoadingSpinner'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
 
@@ -121,7 +122,7 @@ function CreateTaskModal({ onClose, onCreate, loading, error, members }) {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /> Créer la tâche</>}
+          {loading ? <LoadingSpinner size={16} /> : <><Plus size={16} aria-hidden="true" /> Créer la tâche</>}
         </button>
       </form>
     </Modal>
@@ -271,8 +272,9 @@ export default function Labor() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 px-4 pt-4">
-        {[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
+      <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
+        <span className="sr-only">Chargement en cours</span>
+        {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
   }

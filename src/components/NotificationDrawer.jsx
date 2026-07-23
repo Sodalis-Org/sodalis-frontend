@@ -217,9 +217,10 @@ export function NotificationDrawer({ open, onClose }) {
               )}
 
               {loading && merged.length === 0 && (
-                <div className="flex flex-col gap-3 p-4">
+                <div role="status" aria-live="polite" className="flex flex-col gap-3 p-4">
+                  <span className="sr-only">Chargement en cours</span>
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-14 rounded-xl bg-gray-100 animate-pulse" />
+                    <div key={i} aria-hidden="true" className="h-14 rounded-xl bg-gray-100 animate-pulse" />
                   ))}
                 </div>
               )}

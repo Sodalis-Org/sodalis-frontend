@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
   Users, Wrench, Plus, Star, Heart, ShieldCheck, User,
   Droplets, Zap, AirVent, Sofa, Wifi, HelpCircle,
-  ChevronDown, AlertTriangle, Loader2, UserCheck, Copy, Check,
+  ChevronDown, AlertTriangle, UserCheck, Copy, Check,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useDomus } from '../../hooks/useDomus'
@@ -10,6 +10,7 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -151,7 +152,7 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /> Créer le ticket</>}
+          {loading ? <LoadingSpinner size={16} /> : <><Plus size={16} aria-hidden="true" /> Créer le ticket</>}
         </button>
       </form>
     </Modal>
@@ -397,8 +398,9 @@ export default function Domus() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 px-4 pt-4">
-        {[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
+      <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
+        <span className="sr-only">Chargement en cours</span>
+        {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
   }
