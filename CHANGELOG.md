@@ -41,6 +41,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et ce pr
 
 - Mise à jour de `CLAUDE.md` : les affirmations sur l'absence de runner de tests, sur Socket.io
   « non câblé » et sur l'auth link Apollo « à câbler » ne sont plus d'actualité.
+- Le job `lighthouse` de la CI (`ci.yml`) est désormais bloquant : score accessibilité mesuré à
+  1,0 et performance à 0,98, reproductibles sur deux séries de 3 runs (chantier 5 terminé).
 
 ## [1.0.0] - 2026-07-23
 
