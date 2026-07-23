@@ -1,11 +1,14 @@
+import { useId } from 'react'
 import { ChevronDown } from 'lucide-react'
 
 export default function SelectField({ label, value, onChange, options, required = false, placeholder }) {
+  const id = useId()
   return (
     <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+      {label && <label htmlFor={id} className="text-sm font-medium text-gray-700">{label}</label>}
       <div className="relative">
         <select
+          id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           required={required}

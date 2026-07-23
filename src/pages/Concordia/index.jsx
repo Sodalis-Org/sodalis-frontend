@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import {
   MessageSquare, BarChart2, Heart, Plus, X, Trash2,
   CheckCircle, EyeOff, User, Target, Loader2,
@@ -96,7 +96,7 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
         </button>
 
         {error && (
-          <p className="text-xs text-red-600 flex items-center gap-1.5">
+          <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
             <AlertTriangle size={13} /> {error}
           </p>
         )}
@@ -263,6 +263,7 @@ function ComplaintsTab({ complaints, members, currentUserId, isAdmin, onResolve,
 // ─── POLLS ────────────────────────────────────────────────────────────────────
 
 function CreatePollModal({ onClose, onCreate, loading, error }) {
+  const optionLabelId = useId()
   const [question, setQuestion] = useState('')
   const [options, setOptions]   = useState(['', ''])
 
@@ -295,7 +296,9 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
           <span className="text-sm font-medium text-gray-700">Options <span className="text-gray-400 font-normal">(2–6)</span></span>
           {options.map((opt, i) => (
             <div key={i} className="flex gap-2">
+              <label htmlFor={`${optionLabelId}-${i}`} className="sr-only">{`Option ${i + 1}`}</label>
               <input
+                id={`${optionLabelId}-${i}`}
                 value={opt}
                 onChange={(e) => updateOption(i, e.target.value)}
                 required
@@ -325,7 +328,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
         </div>
 
         {error && (
-          <p className="text-xs text-red-600 flex items-center gap-1.5">
+          <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
             <AlertTriangle size={13} /> {error}
           </p>
         )}

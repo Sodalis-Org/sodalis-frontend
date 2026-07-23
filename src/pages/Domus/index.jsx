@@ -140,7 +140,7 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
         )}
 
         {error && (
-          <p className="text-xs text-red-600 flex items-center gap-1.5">
+          <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
             <AlertTriangle size={13} /> {error}
           </p>
         )}

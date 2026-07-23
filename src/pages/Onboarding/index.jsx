@@ -11,7 +11,7 @@ import InputField from '../../components/InputField'
 function ErrorBanner({ message }) {
   if (!message) return null
   return (
-    <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
+    <div role="alert" className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
       <AlertCircle size={16} className="mt-0.5 shrink-0" />
       <span>{message}</span>
     </div>
