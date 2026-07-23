@@ -174,6 +174,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
             </button>
             <button
               onClick={() => onDelete(complaint.id)}
+              aria-label="Supprimer la plainte"
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-medium hover:bg-red-100 transition"
             >
               <Trash2 size={13} />
@@ -183,6 +184,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
         {canAct && isResolved && (
           <button
             onClick={() => onDelete(complaint.id)}
+            aria-label="Supprimer la plainte"
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-400 text-xs hover:bg-gray-100 transition"
           >
             <Trash2 size={13} />
@@ -309,6 +311,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
                 <button
                   type="button"
                   onClick={() => removeOption(i)}
+                  aria-label={`Supprimer l'option ${i + 1}`}
                   className="w-10 h-10 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition shrink-0"
                 >
                   <X size={14} />

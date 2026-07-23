@@ -146,6 +146,7 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
         <button
           onClick={() => !isDone && onAdvance(task)}
           disabled={isDone}
+          aria-label={isDone ? 'Tâche terminée' : task.status === 'IN_PROGRESS' ? 'Marquer comme terminée' : 'Démarrer la tâche'}
           className={clsx(
             'mt-0.5 shrink-0 transition',
             isDone ? 'text-green-500 cursor-default' : 'text-gray-300 hover:text-indigo-500'
@@ -199,6 +200,7 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
           {task.status === 'IN_PROGRESS' && (
             <button
               onClick={() => onRevert(task)}
+              aria-label="Revenir à l'étape précédente"
               className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-gray-50 text-gray-500 text-xs hover:bg-gray-100 transition"
             >
               <RotateCcw size={13} />

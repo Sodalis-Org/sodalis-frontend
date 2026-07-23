@@ -128,12 +128,14 @@ export default function Dashboard() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => refetch()}
+              aria-label="Rafraîchir le tableau de bord"
               className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
               <RefreshCw size={16} />
             </button>
             <button
               onClick={logout}
+              aria-label="Se déconnecter"
               className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
               <LogOut size={16} />

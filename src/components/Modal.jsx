@@ -6,7 +6,7 @@ export default function Modal({ title, onClose, children }) {
       <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-900">{title}</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
+          <button onClick={onClose} aria-label="Fermer" className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
             <X size={16} />
           </button>
         </div>

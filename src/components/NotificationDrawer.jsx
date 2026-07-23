@@ -53,11 +53,12 @@ export function NotificationBell({ onClick }) {
   return (
     <button
       onClick={onClick}
+      aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}` : 'Notifications'}
       className="relative w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition shadow-sm"
     >
       <Bell size={17} />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
+        <span aria-hidden="true" className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
@@ -125,12 +126,14 @@ export function NotificationDrawer({ open, onClose }) {
             <SocketStatus />
             <button
               onClick={() => { setPage(1); refetch() }}
+              aria-label="Rafraîchir les notifications"
               className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
               <RefreshCw size={14} />
             </button>
             <button
               onClick={onClose}
+              aria-label="Fermer les notifications"
               className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
               <X size={16} />
