@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useLabor } from '../../hooks/useLabor'
+import Avatar from '../../components/Avatar'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -26,18 +27,6 @@ function formatDate(iso) {
 }
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
-
-function Avatar({ name, size = 'sm' }) {
-  const initials = name?.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() ?? '?'
-  const colors = ['bg-indigo-100 text-indigo-700', 'bg-purple-100 text-purple-700', 'bg-pink-100 text-pink-700', 'bg-teal-100 text-teal-700', 'bg-amber-100 text-amber-700']
-  const color = colors[(name?.charCodeAt(0) ?? 0) % colors.length]
-  const sz = size === 'xs' ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-xs'
-  return (
-    <div className={clsx('rounded-full flex items-center justify-center font-semibold shrink-0', color, sz)}>
-      {initials}
-    </div>
-  )
-}
 
 function SelectField({ label, value, onChange, options, required }) {
   return (

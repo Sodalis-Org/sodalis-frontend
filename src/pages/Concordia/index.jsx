@@ -6,20 +6,9 @@ import {
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useConcordia } from '../../hooks/useConcordia'
+import Avatar from '../../components/Avatar'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
-
-function Avatar({ name, size = 'sm' }) {
-  const initials = name?.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() ?? '?'
-  const colors = ['bg-indigo-100 text-indigo-700', 'bg-purple-100 text-purple-700', 'bg-pink-100 text-pink-700', 'bg-teal-100 text-teal-700', 'bg-amber-100 text-amber-700']
-  const color = colors[(name?.charCodeAt(0) ?? 0) % colors.length]
-  const sz = size === 'xs' ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-xs'
-  return (
-    <div className={clsx('rounded-full flex items-center justify-center font-semibold shrink-0', color, sz)}>
-      {initials}
-    </div>
-  )
-}
 
 function Modal({ title, onClose, children }) {
   return (
@@ -547,7 +536,7 @@ function KarmaTab({ members, currentUserId, onThank }) {
         .sort((a, b) => b.karma_score - a.karma_score)
         .map((member) => (
           <div key={member.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3">
-            <Avatar name={member.name} />
+            <Avatar name={member.name} size="sm" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
               <div className="flex items-center gap-1 mt-0.5">

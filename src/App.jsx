@@ -3,6 +3,7 @@ import { Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom'
 import { LayoutDashboard, Home, Briefcase, Users } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useAuthContext } from './context/AuthContext'
+import { getPrivateRedirect } from './lib/routeGuard'
 import { NotificationBell, NotificationDrawer } from './components/NotificationDrawer'
 import Dashboard from './pages/Dashboard'
 import Domus from './pages/Domus'
@@ -43,8 +44,8 @@ function BottomNav() {
 
 function PrivateRoute({ children }) {
   const { token, user } = useAuthContext()
-  if (!token) return <Navigate to="/onboarding" replace />
-  if (!user?.coloc_id) return <Navigate to="/onboarding/coloc" replace />
+  const redirect = getPrivateRedirect({ token, user })
+  if (redirect) return <Navigate to={redirect} replace />
   return children
 }
 

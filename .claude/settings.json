@@ -35,7 +35,15 @@
       "Read(//Applications/**)",
       "Bash(timeout 180 npx lhci autorun)",
       "Bash(echo \"lint exit: $?\")",
-      "Bash(rm -rf .lighthouseci)"
+      "Bash(rm -rf .lighthouseci)",
+      "Bash(grep -E '\\\\.\\(js|ts\\)$')",
+      "Bash(cd \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-backend\" && npm run test:coverage --workspaces --if-present 2>&1 | tail -220)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(command -v chromium-cli)",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(npx cross-env *)"
     ]
   }
 }

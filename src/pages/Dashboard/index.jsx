@@ -3,20 +3,9 @@ import { clsx } from 'clsx'
 import { useDashboard } from '../../hooks/useDashboard'
 import { useAuth } from '../../hooks/useAuth'
 import { useAuthContext } from '../../context/AuthContext'
+import Avatar from '../../components/Avatar'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
-
-function Avatar({ name, size = 'md' }) {
-  const initials = name?.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() ?? '?'
-  const colors = ['bg-indigo-100 text-indigo-700', 'bg-purple-100 text-purple-700', 'bg-pink-100 text-pink-700', 'bg-teal-100 text-teal-700', 'bg-amber-100 text-amber-700']
-  const color = colors[(name?.charCodeAt(0) ?? 0) % colors.length]
-  const sizeClass = size === 'sm' ? 'w-8 h-8 text-xs' : size === 'lg' ? 'w-12 h-12 text-base' : 'w-10 h-10 text-sm'
-  return (
-    <div className={clsx('rounded-full flex items-center justify-center font-semibold shrink-0', color, sizeClass)}>
-      {initials}
-    </div>
-  )
-}
 
 function ScoreCard({ label, value, icon: Icon, color }) {
   return (
