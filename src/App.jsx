@@ -54,6 +54,13 @@ function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-xl"
+      >
+        Aller au contenu principal
+      </a>
+
       {/* Global notification bell — fixed top-right */}
       <div className="fixed top-4 right-4 z-30">
         <NotificationBell onClick={() => setDrawerOpen(true)} />
@@ -61,12 +68,14 @@ function AppLayout() {
 
       <NotificationDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
-      <Routes>
-        <Route path="/"          element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-        <Route path="/domus"     element={<PrivateRoute><Domus /></PrivateRoute>} />
-        <Route path="/labor"     element={<PrivateRoute><Labor /></PrivateRoute>} />
-        <Route path="/concordia" element={<PrivateRoute><Concordia /></PrivateRoute>} />
-      </Routes>
+      <main id="main-content" tabIndex={-1}>
+        <Routes>
+          <Route path="/"          element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/domus"     element={<PrivateRoute><Domus /></PrivateRoute>} />
+          <Route path="/labor"     element={<PrivateRoute><Labor /></PrivateRoute>} />
+          <Route path="/concordia" element={<PrivateRoute><Concordia /></PrivateRoute>} />
+        </Routes>
+      </main>
       <BottomNav />
     </div>
   )

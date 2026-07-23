@@ -274,7 +274,13 @@ export default function Onboarding({ colocStep = false }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col items-center justify-center px-5 py-12">
-      <div className="w-full max-w-sm">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-xl"
+      >
+        Aller au contenu principal
+      </a>
+      <main id="main-content" tabIndex={-1} className="w-full max-w-sm">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8 gap-3">
           <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg">
@@ -310,7 +316,7 @@ export default function Onboarding({ colocStep = false }) {
           <div className={clsx('h-1.5 rounded-full transition-all', colocStep ? 'w-3 bg-indigo-300' : 'w-6 bg-indigo-600')} />
           <div className={clsx('h-1.5 rounded-full transition-all', colocStep ? 'w-6 bg-indigo-600' : 'w-3 bg-indigo-200')} />
         </div>
-      </div>
+      </main>
     </div>
   )
 }
