@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useQuery } from '@apollo/client'
 import { Bell, X, Wifi, WifiOff, RefreshCw } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useSocket } from '../context/SocketContext'
 import { useAuthContext } from '../context/AuthContext'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 import { GET_NOTIFICATIONS } from '../graphql/dashboard'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -71,6 +72,8 @@ export function NotificationBell({ onClick }) {
 const PAGE_SIZE = 15
 
 export function NotificationDrawer({ open, onClose }) {
+  const titleId = useId()
+  const panelRef = useFocusTrap({ active: open, onClose })
   const { user } = useAuthContext()
   const { notifications: liveNotifs, unreadCount, markAllRead } = useSocket()
   const [page, setPage] = useState(1)
@@ -112,12 +115,19 @@ export function NotificationDrawer({ open, onClose }) {
       />
 
       {/* Panel */}
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm bg-white shadow-2xl flex flex-col">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm bg-white shadow-2xl flex flex-col"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-12 pb-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <Bell size={18} className="text-indigo-600" />
-            <h2 className="text-base font-bold text-gray-900">Notifications</h2>
+            <h2 id={titleId} className="text-base font-bold text-gray-900">Notifications</h2>
             {unreadCount === 0 && liveNotifs.length > 0 && (
               <span className="text-xs text-gray-400">(tout lu)</span>
             )}
