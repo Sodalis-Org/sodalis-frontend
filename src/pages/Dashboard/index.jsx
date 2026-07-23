@@ -2,6 +2,7 @@ import { RefreshCw, LogOut, Star, Heart, CheckSquare, AlertTriangle, Bell, Clock
 import { clsx } from 'clsx'
 import { useDashboard } from '../../hooks/useDashboard'
 import { useAuth } from '../../hooks/useAuth'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { useAuthContext } from '../../context/AuthContext'
 import Avatar from '../../components/Avatar'
 
@@ -81,6 +82,7 @@ function LoadingState() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
+  useDocumentTitle('Tableau de bord')
   const { user } = useAuthContext()
   const { logout } = useAuth()
   const {

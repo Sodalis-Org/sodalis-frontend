@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useDomus } from '../../hooks/useDomus'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
@@ -356,6 +357,7 @@ function MaintenanceTab({ tickets, members, isAdmin, onUpdateStatus, onAssign })
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Domus() {
+  useDocumentTitle('Domus')
   const [activeTab, setActiveTab]       = useState('members')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [inviteCopied, setInviteCopied] = useState(false)

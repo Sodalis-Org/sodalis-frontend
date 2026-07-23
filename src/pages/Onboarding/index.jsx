@@ -4,6 +4,7 @@ import { Home, LogIn, UserPlus, Key, Plus, AlertCircle, Loader2, Copy, Check } f
 import { clsx } from 'clsx'
 import { useAuthContext } from '../../context/AuthContext'
 import { useAuth } from '../../hooks/useAuth'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import InputField from '../../components/InputField'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
@@ -263,6 +264,7 @@ function ColocStep() {
 // ─── Page shell ───────────────────────────────────────────────────────────────
 
 export default function Onboarding({ colocStep = false }) {
+  useDocumentTitle(colocStep ? 'Configurer ma colocation' : 'Connexion')
   const { user, loading } = useAuthContext()
 
   if (loading) return null

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useConcordia } from '../../hooks/useConcordia'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
@@ -543,6 +544,7 @@ const TABS = [
 ]
 
 export default function Concordia() {
+  useDocumentTitle('Concordia')
   const [activeTab, setActiveTab] = useState('complaints')
 
   const {

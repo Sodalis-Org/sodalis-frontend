@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useLabor } from '../../hooks/useLabor'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
@@ -242,6 +243,7 @@ function TaskSection({ title, tasks, statusDot, emptyLabel, children }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Labor() {
+  useDocumentTitle('Labor')
   const [activeTab, setActiveTab]         = useState('all')
   const [showCreateModal, setShowCreateModal] = useState(false)
 
