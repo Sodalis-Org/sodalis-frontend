@@ -5,7 +5,7 @@ import { GET_TASKS_BY_COLOC, CREATE_TASK, UPDATE_TASK_STATUS } from '../graphql/
 import { GET_USERS_BY_COLOC } from '../graphql/users'
 
 export function useLabor() {
-  const { user } = useAuthContext()
+  const { user, loading: authLoading } = useAuthContext()
   const colocId = user?.coloc_id
 
   const [formError, setFormError] = useState(null)
@@ -80,7 +80,7 @@ export function useLabor() {
   }
 
   return {
-    loading: tasksLoading || usersLoading,
+    loading: authLoading || tasksLoading || usersLoading,
     createLoading,
     formError,
     setFormError,

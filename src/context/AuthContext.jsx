@@ -1,36 +1,29 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useCallback } from 'react'
+import { useQuery, useMutation, useApolloClient } from '@apollo/client'
+import { ME, LOGOUT } from '../graphql/auth'
 
 const AuthContext = createContext(null)
 
-function decodeToken(token) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]))
-  } catch {
-    return null
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [token, setTokenState] = useState(() => localStorage.getItem('sodalis_token'))
-  const [user, setUser] = useState(() => {
-    const t = localStorage.getItem('sodalis_token')
-    return t ? decodeToken(t) : null
-  })
+  const client = useApolloClient()
+  // Le jeton vit dans un cookie httpOnly, invisible en JS : on ne peut savoir qui
+  // est connecté qu'en le demandant au serveur (utile au premier rendu / après reload).
+  const { data, loading, refetch } = useQuery(ME, { fetchPolicy: 'network-only' })
+  const [logoutMutation] = useMutation(LOGOUT)
 
-  const saveToken = useCallback((newToken) => {
-    localStorage.setItem('sodalis_token', newToken)
-    setTokenState(newToken)
-    setUser(decodeToken(newToken))
-  }, [])
+  const refreshUser = useCallback(() => refetch(), [refetch])
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('sodalis_token')
-    setTokenState(null)
-    setUser(null)
-  }, [])
+  const logout = useCallback(async () => {
+    try {
+      await logoutMutation()
+    } finally {
+      await client.clearStore()
+      await refetch()
+    }
+  }, [logoutMutation, client, refetch])
 
   return (
-    <AuthContext.Provider value={{ token, user, saveToken, logout }}>
+    <AuthContext.Provider value={{ user: data?.me ?? null, loading, refreshUser, logout }}>
       {children}
     </AuthContext.Provider>
   )

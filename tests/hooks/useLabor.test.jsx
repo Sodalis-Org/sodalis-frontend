@@ -2,7 +2,7 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { GET_TASKS_BY_COLOC, CREATE_TASK, UPDATE_TASK_STATUS } from '../../src/graphql/tasks'
 import { GET_USERS_BY_COLOC } from '../../src/graphql/users'
 import { useLabor } from '../../src/hooks/useLabor'
-import { setAuthUser, makeWrapper } from '../utils.jsx'
+import { setAuthUser, resetAuthUser, makeWrapper } from '../utils.jsx'
 
 const colocId = 'c1'
 
@@ -27,7 +27,7 @@ function baseMocks() {
 
 describe('useLabor', () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetAuthUser()
     setAuthUser({ id: 'u1', coloc_id: colocId })
   })
 

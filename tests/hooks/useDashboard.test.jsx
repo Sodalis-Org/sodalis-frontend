@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { GET_COLOC_DASHBOARD, GET_NOTIFICATIONS } from '../../src/graphql/dashboard'
 import { GET_MAINTENANCE_TICKETS } from '../../src/graphql/maintenance'
 import { useDashboard } from '../../src/hooks/useDashboard'
-import { setAuthUser, makeWrapper } from '../utils.jsx'
+import { setAuthUser, resetAuthUser, makeWrapper } from '../utils.jsx'
 
 const colocId = 'c1'
 
@@ -43,7 +43,7 @@ function baseMocks() {
 
 describe('useDashboard', () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetAuthUser()
     setAuthUser({ id: 'u1', coloc_id: colocId })
   })
 

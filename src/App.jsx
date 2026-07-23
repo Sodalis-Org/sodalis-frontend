@@ -43,8 +43,9 @@ function BottomNav() {
 }
 
 function PrivateRoute({ children }) {
-  const { token, user } = useAuthContext()
-  const redirect = getPrivateRedirect({ token, user })
+  const { user, loading } = useAuthContext()
+  if (loading) return null
+  const redirect = getPrivateRedirect({ user })
   if (redirect) return <Navigate to={redirect} replace />
   return children
 }

@@ -11,7 +11,7 @@ import {
   THANK_USER,
 } from '../../src/graphql/concordia'
 import { useConcordia } from '../../src/hooks/useConcordia'
-import { setAuthUser, makeWrapper } from '../utils.jsx'
+import { setAuthUser, resetAuthUser, makeWrapper } from '../utils.jsx'
 
 const colocId = 'c1'
 
@@ -34,7 +34,7 @@ function baseMocks() {
 
 describe('useConcordia', () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetAuthUser()
     setAuthUser({ id: 'u1', coloc_id: colocId, role: 'ADMIN' })
   })
 

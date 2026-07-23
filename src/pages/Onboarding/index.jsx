@@ -293,11 +293,12 @@ function ColocStep() {
 // ─── Page shell ───────────────────────────────────────────────────────────────
 
 export default function Onboarding({ colocStep = false }) {
-  const { user, token } = useAuthContext()
+  const { user, loading } = useAuthContext()
 
-  if (token && user?.coloc_id) return <Navigate to="/" replace />
-  if (colocStep && !token) return <Navigate to="/onboarding" replace />
-  if (!colocStep && token && !user?.coloc_id) return <Navigate to="/onboarding/coloc" replace />
+  if (loading) return null
+  if (user && user.coloc_id) return <Navigate to="/" replace />
+  if (colocStep && !user) return <Navigate to="/onboarding" replace />
+  if (!colocStep && user && !user.coloc_id) return <Navigate to="/onboarding/coloc" replace />
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col items-center justify-center px-5 py-12">

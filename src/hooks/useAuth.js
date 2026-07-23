@@ -4,16 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { LOGIN, REGISTER, CREATE_COLOC, JOIN_COLOC } from '../graphql/auth'
 import { useAuthContext } from '../context/AuthContext'
 
-function decodeToken(token) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]))
-  } catch {
-    return null
-  }
-}
-
 export function useAuth() {
-  const { saveToken, logout } = useAuthContext()
+  const { refreshUser, logout } = useAuthContext()
   const navigate = useNavigate()
   const [error, setError] = useState(null)
 
@@ -26,10 +18,8 @@ export function useAuth() {
     setError(null)
     try {
       const { data } = await loginMutation({ variables: { email, password } })
-      const { token } = data.login
-      saveToken(token)
-      const payload = decodeToken(token)
-      navigate(payload?.coloc_id ? '/' : '/onboarding/coloc')
+      await refreshUser()
+      navigate(data.login.user.coloc_id ? '/' : '/onboarding/coloc')
     } catch (e) {
       setError(e.graphQLErrors?.[0]?.message ?? e.message)
     }
@@ -49,7 +39,7 @@ export function useAuth() {
     setError(null)
     try {
       const { data } = await createColocMutation({ variables: { name } })
-      saveToken(data.createColoc.token)
+      await refreshUser()
       return data.createColoc.coloc
     } catch (e) {
       setError(e.graphQLErrors?.[0]?.message ?? e.message)
@@ -60,16 +50,16 @@ export function useAuth() {
   const joinColoc = async (invite_code) => {
     setError(null)
     try {
-      const { data } = await joinColocMutation({ variables: { invite_code } })
-      saveToken(data.joinColoc.token)
+      await joinColocMutation({ variables: { invite_code } })
+      await refreshUser()
       navigate('/')
     } catch (e) {
       setError(e.graphQLErrors?.[0]?.message ?? e.message)
     }
   }
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigate('/onboarding')
   }
 
