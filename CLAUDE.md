@@ -10,7 +10,9 @@ npm run build    # Production build
 npm run preview  # Preview production build locally
 ```
 
-No test runner or linter is configured yet.
+ESLint (including `eslint-plugin-jsx-a11y`) and Vitest (`npm run test` / `npm run test:coverage`,
+60% line coverage threshold on `src/hooks`/`src/context`/`src/lib` — see `QUALITY.md`) are
+configured and run in CI on every push/PR.
 
 ## Architecture
 
@@ -28,8 +30,12 @@ The frontend **never** calls service-domus (:3001), service-labor (:3002), or an
 ### Data flow
 
 - **Apollo Client** (`src/lib/apolloClient.js`) handles all GraphQL calls.
-- **Socket.io-client** (not yet wired) will connect to `:3003` for real-time notifications. Set it up in `src/context/`.
-- **Authentication**: JWT stored locally. The token must be replaced after `createColoc` and `joinColoc` mutations — both return a new token with an updated `coloc_id`. Pass the token as `Authorization: Bearer <token>` on every request (wire this as an Apollo auth link in `apolloClient.js`).
+- **Socket.io-client** connects to `:3003` for real-time notifications, wired in
+  `src/context/SocketContext.jsx`.
+- **Authentication**: JWT stored in `localStorage` under the `sodalis_token` key. The token must
+  be replaced after `createColoc` and `joinColoc` mutations — both return a new token with an
+  updated `coloc_id`. `src/lib/apolloClient.js` reads it via an Apollo auth link (`setContext`)
+  and sends it as `Authorization: Bearer <token>` on every request.
 
 ### Routing & layout
 
