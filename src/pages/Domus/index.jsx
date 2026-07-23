@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import {
-  Users, Wrench, Plus, X, Star, Heart, ShieldCheck, User,
+  Users, Wrench, Plus, Star, Heart, ShieldCheck, User,
   Droplets, Zap, AirVent, Sofa, Wifi, HelpCircle,
   ChevronDown, AlertTriangle, Loader2, UserCheck, Copy, Check,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useDomus } from '../../hooks/useDomus'
 import Avatar from '../../components/Avatar'
+import Modal from '../../components/Modal'
+import SelectField from '../../components/SelectField'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -71,26 +73,6 @@ function TabBar({ tabs, active, onChange }) {
   )
 }
 
-function SelectField({ label, value, onChange, options }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition pr-8"
-        >
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-      </div>
-    </div>
-  )
-}
-
 // ─── Create ticket modal ──────────────────────────────────────────────────────
 
 function CreateTicketModal({ onClose, onCreate, loading, error }) {
@@ -106,81 +88,72 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-900">Nouveau ticket</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
-            <X size={16} />
-          </button>
+    <Modal title="Nouveau ticket" onClose={onClose}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="ticket-title" className="text-sm font-medium text-gray-700">Titre</label>
+          <input
+            id="ticket-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            maxLength={200}
+            placeholder="Ex: Robinet qui fuit sous l'évier"
+            className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="ticket-title" className="text-sm font-medium text-gray-700">Titre</label>
-            <input
-              id="ticket-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              maxLength={200}
-              placeholder="Ex: Robinet qui fuit sous l'évier"
-              className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="ticket-description" className="text-sm font-medium text-gray-700">
+            Description <span className="text-gray-400 font-normal">(optionnel)</span>
+          </label>
+          <textarea
+            id="ticket-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Détails supplémentaires..."
+            rows={3}
+            className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <SelectField
+            label="Catégorie"
+            value={category}
+            onChange={setCategory}
+            options={CATEGORIES.map((c) => ({ value: c.value, label: c.label }))}
+          />
+          <SelectField
+            label="Priorité"
+            value={priority}
+            onChange={setPriority}
+            options={PRIORITIES.map((p) => ({ value: p.value, label: p.label }))}
+          />
+        </div>
+
+        {priority === 'URGENT' && (
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs">
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+            <span>Priorité URGENT — une tâche sera automatiquement créée dans Labor.</span>
           </div>
+        )}
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="ticket-description" className="text-sm font-medium text-gray-700">
-              Description <span className="text-gray-400 font-normal">(optionnel)</span>
-            </label>
-            <textarea
-              id="ticket-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Détails supplémentaires..."
-              rows={3}
-              className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          </div>
+        {error && (
+          <p className="text-xs text-red-600 flex items-center gap-1.5">
+            <AlertTriangle size={13} /> {error}
+          </p>
+        )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <SelectField
-              label="Catégorie"
-              value={category}
-              onChange={setCategory}
-              options={CATEGORIES.map((c) => ({ value: c.value, label: c.label }))}
-            />
-            <SelectField
-              label="Priorité"
-              value={priority}
-              onChange={setPriority}
-              options={PRIORITIES.map((p) => ({ value: p.value, label: p.label }))}
-            />
-          </div>
-
-          {priority === 'URGENT' && (
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs">
-              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-              <span>Priorité URGENT — une tâche sera automatiquement créée dans Labor.</span>
-            </div>
-          )}
-
-          {error && (
-            <p className="text-xs text-red-600 flex items-center gap-1.5">
-              <AlertTriangle size={13} /> {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
-          >
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /> Créer le ticket</>}
-          </button>
-        </form>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
+        >
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /> Créer le ticket</>}
+        </button>
+      </form>
+    </Modal>
   )
 }
 

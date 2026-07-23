@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import {
-  Plus, X, Clock, CheckCircle2, Circle,
+  Plus, Clock, CheckCircle2, Circle,
   ArrowRight, RotateCcw, ChevronDown, AlertTriangle,
   Loader2, Star, CalendarDays
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useLabor } from '../../hooks/useLabor'
 import Avatar from '../../components/Avatar'
+import Modal from '../../components/Modal'
+import SelectField from '../../components/SelectField'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -24,30 +26,6 @@ function isOverdue(due_at) {
 function formatDate(iso) {
   if (!iso) return null
   return new Date(iso).toLocaleDateString('fr', { day: 'numeric', month: 'short' })
-}
-
-// ─── Shared primitives ────────────────────────────────────────────────────────
-
-function SelectField({ label, value, onChange, options, required }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          required={required}
-          className="w-full appearance-none px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition pr-8"
-        >
-          <option value="">-- Choisir --</option>
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-      </div>
-    </div>
-  )
 }
 
 // ─── Score toast ──────────────────────────────────────────────────────────────
@@ -85,75 +63,67 @@ function CreateTaskModal({ onClose, onCreate, loading, error, members }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-900">Nouvelle tâche</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
-            <X size={16} />
-          </button>
+    <Modal title="Nouvelle tâche" onClose={onClose}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="task-title" className="text-sm font-medium text-gray-700">Titre</label>
+          <input
+            id="task-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            maxLength={150}
+            placeholder="Ex: Passer l'aspirateur au salon"
+            className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="task-title" className="text-sm font-medium text-gray-700">Titre</label>
+        <SelectField
+          label="Assigner à"
+          value={assigneeId}
+          onChange={setAssigneeId}
+          required
+          placeholder="-- Choisir --"
+          options={members.map((m) => ({ value: m.id, label: m.name }))}
+        />
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="task-due-at" className="text-sm font-medium text-gray-700">
+            Date limite <span className="text-gray-400 font-normal">(optionnel)</span>
+          </label>
+          <div className="relative">
             <input
-              id="task-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              maxLength={150}
-              placeholder="Ex: Passer l'aspirateur au salon"
-              className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              id="task-due-at"
+              type="date"
+              value={dueAt}
+              onChange={(e) => setDueAt(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
+            <CalendarDays size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
+        </div>
 
-          <SelectField
-            label="Assigner à"
-            value={assigneeId}
-            onChange={setAssigneeId}
-            required
-            options={members.map((m) => ({ value: m.id, label: m.name }))}
-          />
+        <div className="flex items-start gap-2 p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs">
+          <Star size={13} className="mt-0.5 shrink-0" />
+          <span>Terminer avant la date limite rapporte <strong>+10 Harmony</strong>. Après : +2.</span>
+        </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="task-due-at" className="text-sm font-medium text-gray-700">
-              Date limite <span className="text-gray-400 font-normal">(optionnel)</span>
-            </label>
-            <div className="relative">
-              <input
-                id="task-due-at"
-                type="date"
-                value={dueAt}
-                onChange={(e) => setDueAt(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-              />
-              <CalendarDays size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            </div>
-          </div>
+        {error && (
+          <p className="text-xs text-red-600 flex items-center gap-1.5">
+            <AlertTriangle size={13} /> {error}
+          </p>
+        )}
 
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs">
-            <Star size={13} className="mt-0.5 shrink-0" />
-            <span>Terminer avant la date limite rapporte <strong>+10 Harmony</strong>. Après : +2.</span>
-          </div>
-
-          {error && (
-            <p className="text-xs text-red-600 flex items-center gap-1.5">
-              <AlertTriangle size={13} /> {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
-          >
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /> Créer la tâche</>}
-          </button>
-        </form>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
+        >
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /> Créer la tâche</>}
+        </button>
+      </form>
+    </Modal>
   )
 }
 

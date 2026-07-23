@@ -2,47 +2,15 @@ import { useState } from 'react'
 import {
   MessageSquare, BarChart2, Heart, Plus, X, Trash2,
   CheckCircle, EyeOff, User, Target, Loader2,
-  AlertTriangle, ChevronDown, Sparkles, Lock
+  AlertTriangle, Sparkles, Lock
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useConcordia } from '../../hooks/useConcordia'
 import Avatar from '../../components/Avatar'
+import Modal from '../../components/Modal'
+import SelectField from '../../components/SelectField'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
-
-function Modal({ title, onClose, children }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-900">{title}</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
-            <X size={16} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  )
-}
-
-function SelectField({ label, value, onChange, options }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition pr-8"
-        >
-          {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-      </div>
-    </div>
-  )
-}
 
 function timeAgo(isoDate) {
   if (!isoDate) return ''
