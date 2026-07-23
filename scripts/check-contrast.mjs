@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Vérifie le ratio de contraste WCAG 2.1 (RGAA 3.2) de chaque combinaison
 // fond/texte réellement utilisée dans src/ avec les classes Tailwind par
-// défaut (pas de surcouche dans tailwind.config.js). Script autonome, aucune
-// dépendance nouvelle. Exécution manuelle (tâches 5.1 et 5.4) :
+// défaut (pas de surcouche dans tailwind.config.js). Exécution manuelle
+// (tâches 5.1 et 5.4) :
 //
 //   node scripts/check-contrast.mjs
 //
@@ -10,6 +10,8 @@
 // texte large (>= 24px, ou >= 19px en gras) ou pour un composant d'interface
 // / objet graphique non-décoratif (WCAG 1.4.11) — ex. une icône seule dans
 // un bouton, sans texte visible à côté.
+
+import { contrast } from '../src/lib/contrast.js'
 
 // Valeurs hexadécimales de la palette Tailwind par défaut (v3), pour les
 // teintes réellement utilisées dans le dépôt.
@@ -51,17 +53,6 @@ const PALETTE = {
   'purple-600': '#9333EA',
   'purple-700': '#7E22CE',
   'purple-800': '#6B21A8',
-}
-
-function luminance(hex) {
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
-  const lin = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
-}
-
-function contrast(hexA, hexB) {
-  const [l1, l2] = [luminance(hexA), luminance(hexB)].sort((a, b) => b - a)
-  return (l1 + 0.05) / (l2 + 0.05)
 }
 
 // Une ligne par combinaison fond/texte distincte réellement trouvée dans
