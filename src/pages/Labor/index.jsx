@@ -40,7 +40,7 @@ function ScoreToast({ completed }) {
         'flex items-center gap-2 px-4 py-2.5 rounded-2xl shadow-lg text-sm font-semibold text-white',
         completed.isOnTime ? 'bg-indigo-600' : 'bg-indigo-400'
       )}>
-        <Star size={15} />
+        <Star size={15} aria-hidden="true" />
         <span>+{completed.points} Harmony{completed.isOnTime ? ' · Dans les temps !' : ''}</span>
       </div>
     </div>
@@ -102,18 +102,18 @@ function CreateTaskModal({ onClose, onCreate, loading, error, members }) {
               min={new Date().toISOString().split('T')[0]}
               className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
-            <CalendarDays size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
+            <CalendarDays size={14} aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
           </div>
         </div>
 
         <div className="flex items-start gap-2 p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs">
-          <Star size={13} className="mt-0.5 shrink-0" />
+          <Star size={13} aria-hidden="true" className="mt-0.5 shrink-0" />
           <span>Terminer avant la date limite rapporte <strong>+10 Harmony</strong>. Après : +2.</span>
         </div>
 
         {error && (
           <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
-            <AlertTriangle size={13} /> {error}
+            <AlertTriangle size={13} aria-hidden="true" /> {error}
           </p>
         )}
 
@@ -155,10 +155,10 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
           )}
         >
           {isDone
-            ? <CheckCircle2 size={22} />
+            ? <CheckCircle2 size={22} aria-hidden="true" />
             : task.status === 'IN_PROGRESS'
-              ? <CheckCircle2 size={22} className="text-blue-400" />
-              : <Circle size={22} />
+              ? <CheckCircle2 size={22} aria-hidden="true" className="text-blue-400" />
+              : <Circle size={22} aria-hidden="true" />
           }
         </button>
 
@@ -177,7 +177,7 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
             )}
             {task.due_at && (
               <div className={clsx('flex items-center gap-1 text-xs', overdue ? 'text-red-500 font-medium' : 'text-gray-600')}>
-                <Clock size={11} />
+                <Clock size={11} aria-hidden="true" />
                 <span>{overdue && !isDone ? 'En retard · ' : ''}{formatDate(task.due_at)}</span>
               </div>
             )}
@@ -196,7 +196,7 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
             onClick={() => onAdvance(task)}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-semibold hover:bg-indigo-100 transition"
           >
-            <ArrowRight size={13} />
+            <ArrowRight size={13} aria-hidden="true" />
             {task.status === 'TODO' ? 'Démarrer' : 'Marquer terminé'}
           </button>
           {task.status === 'IN_PROGRESS' && (
@@ -205,7 +205,7 @@ function TaskCard({ task, members, currentUserId, onAdvance, onRevert }) {
               aria-label="Revenir à l'étape précédente"
               className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-gray-50 text-gray-500 text-xs hover:bg-gray-100 transition"
             >
-              <RotateCcw size={13} />
+              <RotateCcw size={13} aria-hidden="true" />
             </button>
           )}
         </div>
@@ -227,7 +227,7 @@ function TaskSection({ title, tasks, statusDot, emptyLabel, children }) {
         <span className={clsx('w-2 h-2 rounded-full shrink-0', statusDot)} />
         <span className="text-sm font-semibold text-gray-600">{title}</span>
         <span className="text-xs text-gray-600 font-medium">({tasks.length})</span>
-        <ChevronDown size={14} className={clsx('text-gray-600 ml-auto transition-transform', collapsed && '-rotate-90')} />
+        <ChevronDown size={14} aria-hidden="true" className={clsx('text-gray-600 ml-auto transition-transform', collapsed && '-rotate-90')} />
       </button>
 
       {!collapsed && (
@@ -305,7 +305,7 @@ export default function Labor() {
               onClick={() => setShowCreateModal(true)}
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
             >
-              <Plus size={16} /> Créer
+              <Plus size={16} aria-hidden="true" /> Créer
             </button>
           </div>
 

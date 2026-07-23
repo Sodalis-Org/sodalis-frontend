@@ -30,7 +30,7 @@ export default function InputField({ label, type = 'text', value, onChange, plac
             aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-600 hover:text-gray-700"
           >
-            {show ? <EyeOff size={16} /> : <Eye size={16} />}
+            {show ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
           </button>
         )}
       </div>

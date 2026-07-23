@@ -32,7 +32,7 @@ function KarmaToast({ feedback }) {
   return (
     <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
       <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-600 shadow-lg text-sm font-semibold text-white">
-        <Sparkles size={15} />
+        <Sparkles size={15} aria-hidden="true" />
         <span>+3 Karma pour {feedback.name} · total : {feedback.score}</span>
       </div>
     </div>
@@ -85,7 +85,7 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
             isAnonymous ? 'bg-gray-900 border-gray-900 text-white' : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
           )}
         >
-          <EyeOff size={16} className="shrink-0" />
+          <EyeOff size={16} aria-hidden="true" className="shrink-0" />
           <div className="flex flex-col items-start">
             <span>Plainte anonyme</span>
             <span className={clsx('text-xs font-normal', isAnonymous ? 'text-gray-300' : 'text-gray-600')}>
@@ -99,7 +99,7 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
 
         {error && (
           <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
-            <AlertTriangle size={13} /> {error}
+            <AlertTriangle size={13} aria-hidden="true" /> {error}
           </p>
         )}
 
@@ -128,7 +128,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
         <div className="flex items-center gap-2 flex-wrap">
           {complaint.is_anonymous ? (
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <EyeOff size={13} />
+              <EyeOff size={13} aria-hidden="true" />
               <span className="font-medium">Auteur anonyme</span>
             </div>
           ) : creator ? (
@@ -138,7 +138,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
             </div>
           ) : (
             <div className="flex items-center gap-1.5 text-xs text-gray-600">
-              <User size={13} /> <span>Utilisateur supprimé</span>
+              <User size={13} aria-hidden="true" /> <span>Utilisateur supprimé</span>
             </div>
           )}
 
@@ -146,7 +146,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
             <>
               <span className="text-gray-300 text-xs">→</span>
               <div className="flex items-center gap-1.5">
-                <Target size={12} className="text-orange-400" />
+                <Target size={12} aria-hidden="true" className="text-orange-400" />
                 <span className="text-xs font-medium text-orange-600">{target.name}</span>
               </div>
             </>
@@ -172,14 +172,14 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
               onClick={() => onResolve(complaint.id)}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 text-xs font-medium hover:bg-green-100 transition"
             >
-              <CheckCircle size={13} /> Résoudre
+              <CheckCircle size={13} aria-hidden="true" /> Résoudre
             </button>
             <button
               onClick={() => onDelete(complaint.id)}
               aria-label="Supprimer la plainte"
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-medium hover:bg-red-100 transition"
             >
-              <Trash2 size={13} />
+              <Trash2 size={13} aria-hidden="true" />
             </button>
           </div>
         )}
@@ -189,7 +189,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
             aria-label="Supprimer la plainte"
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-xs hover:bg-gray-100 transition"
           >
-            <Trash2 size={13} />
+            <Trash2 size={13} aria-hidden="true" />
           </button>
         )}
       </div>
@@ -237,13 +237,13 @@ function ComplaintsTab({ complaints, members, currentUserId, isAdmin, onResolve,
             onClick={() => setShowModal(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition"
           >
-            <Plus size={14} /> Déposer
+            <Plus size={14} aria-hidden="true" /> Déposer
           </button>
         </div>
 
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-            <MessageSquare size={28} className="mx-auto text-gray-300 mb-2" />
+            <MessageSquare size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
             <p className="text-sm text-gray-600">Aucune plainte {filter === 'open' ? 'ouverte' : filter === 'resolved' ? 'résolue' : ''}</p>
           </div>
         ) : (
@@ -316,7 +316,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
                   aria-label={`Supprimer l'option ${i + 1}`}
                   className="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center hover:bg-red-100 transition shrink-0"
                 >
-                  <X size={14} />
+                  <X size={14} aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -327,14 +327,14 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
               onClick={addOption}
               className="flex items-center gap-2 px-3 py-2 rounded-xl border border-dashed border-gray-300 text-xs text-gray-500 hover:border-indigo-400 hover:text-indigo-500 transition"
             >
-              <Plus size={13} /> Ajouter une option
+              <Plus size={13} aria-hidden="true" /> Ajouter une option
             </button>
           )}
         </div>
 
         {error && (
           <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
-            <AlertTriangle size={13} /> {error}
+            <AlertTriangle size={13} aria-hidden="true" /> {error}
           </p>
         )}
 
@@ -363,7 +363,7 @@ function PollCard({ poll, currentUserId, onVote }) {
         <p className="text-sm font-semibold text-gray-900 leading-snug flex-1">{poll.question}</p>
         {isClosed ? (
           <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium shrink-0">
-            <Lock size={11} /> Fermé
+            <Lock size={11} aria-hidden="true" /> Fermé
           </span>
         ) : (
           <span className="px-2 py-0.5 rounded-lg bg-green-100 text-green-700 text-xs font-medium shrink-0">Ouvert</span>
@@ -470,13 +470,13 @@ function PollsTab({ polls, currentUserId, onVote, onCreate, createLoading, error
             onClick={() => setShowModal(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition"
           >
-            <Plus size={14} /> Créer
+            <Plus size={14} aria-hidden="true" /> Créer
           </button>
         </div>
 
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-            <BarChart2 size={28} className="mx-auto text-gray-300 mb-2" />
+            <BarChart2 size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
             <p className="text-sm text-gray-600">Aucun sondage {filter === 'open' ? 'ouvert' : filter === 'closed' ? 'fermé' : ''}</p>
           </div>
         ) : (
@@ -503,7 +503,7 @@ function KarmaTab({ members, currentUserId, onThank }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-2 p-3 rounded-xl bg-purple-50 border border-purple-100 text-purple-700 text-xs">
-        <Sparkles size={14} className="mt-0.5 shrink-0" />
+        <Sparkles size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
         <span>Remerciez un colocataire pour une bonne action — il reçoit <strong>+3 Karma</strong>.</span>
       </div>
 
@@ -516,7 +516,7 @@ function KarmaTab({ members, currentUserId, onThank }) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
               <div className="flex items-center gap-1 mt-0.5">
-                <Heart size={11} className="text-purple-400" />
+                <Heart size={11} aria-hidden="true" className="text-purple-400" />
                 <span className="text-xs text-purple-600 font-medium">{member.karma_score} karma</span>
               </div>
             </div>
@@ -602,7 +602,7 @@ export default function Concordia() {
                   activeTab === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'
                 )}
               >
-                <tab.Icon size={14} />
+                <tab.Icon size={14} aria-hidden="true" />
                 {tab.label}
               </button>
             ))}

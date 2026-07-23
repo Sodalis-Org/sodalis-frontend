@@ -33,7 +33,7 @@ function BottomNav() {
               isActive ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-400'
             )}
           >
-            <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
+            <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} aria-hidden="true" />
             <span>{label}</span>
           </NavLink>
         )

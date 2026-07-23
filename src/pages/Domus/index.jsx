@@ -62,7 +62,7 @@ function TabBar({ tabs, active, onChange }) {
             active === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'
           )}
         >
-          <tab.Icon size={15} />
+          <tab.Icon size={15} aria-hidden="true" />
           {tab.label}
           {tab.count > 0 && (
             <span className={clsx('text-xs rounded-full px-1.5 py-0.5 font-semibold',
@@ -136,14 +136,14 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
 
         {priority === 'URGENT' && (
           <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs">
-            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+            <AlertTriangle size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
             <span>Priorité URGENT — une tâche sera automatiquement créée dans Labor.</span>
           </div>
         )}
 
         {error && (
           <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
-            <AlertTriangle size={13} /> {error}
+            <AlertTriangle size={13} aria-hidden="true" /> {error}
           </p>
         )}
 
@@ -177,7 +177,7 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
     <div className={clsx('bg-white rounded-2xl border p-4 flex flex-col gap-3 transition', isDone ? 'border-gray-100 opacity-60' : 'border-gray-200')}>
       <div className="flex items-start gap-3">
         <div className={clsx('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', priority?.color ?? 'bg-gray-100 text-gray-500')}>
-          <CatIcon size={17} />
+          <CatIcon size={17} aria-hidden="true" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-900 leading-snug">{ticket.title}</p>
@@ -195,7 +195,7 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
 
       {assignee && (
         <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <UserCheck size={13} />
+          <UserCheck size={13} aria-hidden="true" />
           <span>Assigné à <span className="font-medium text-gray-700">{assignee.name}</span></span>
         </div>
       )}
@@ -209,7 +209,7 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
                 className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-100 transition"
               >
                 <span>Changer statut</span>
-                <ChevronDown size={13} />
+                <ChevronDown size={13} aria-hidden="true" />
               </button>
               {statusOpen && (
                 <div className="absolute bottom-full mb-1 left-0 right-0 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden z-20">
@@ -237,7 +237,7 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
                 className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-100 transition"
               >
                 <span>{assignee ? 'Réassigner' : 'Assigner'}</span>
-                <ChevronDown size={13} />
+                <ChevronDown size={13} aria-hidden="true" />
               </button>
               {assignOpen && (
                 <div className="absolute bottom-full mb-1 left-0 right-0 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden z-20">
@@ -284,16 +284,16 @@ function MembersTab({ members, currentUserId }) {
           <div className="flex flex-col items-end gap-1.5 shrink-0">
             {member.role === 'ADMIN' ? (
               <span className="flex items-center gap-1 text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">
-                <ShieldCheck size={11} /> Admin
+                <ShieldCheck size={11} aria-hidden="true" /> Admin
               </span>
             ) : (
               <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">
-                <User size={11} /> Membre
+                <User size={11} aria-hidden="true" /> Membre
               </span>
             )}
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><Star size={10} className="text-indigo-400" />{member.harmony_score}</span>
-              <span className="flex items-center gap-1"><Heart size={10} className="text-purple-400" />{member.karma_score}</span>
+              <span className="flex items-center gap-1"><Star size={10} aria-hidden="true" className="text-indigo-400" />{member.harmony_score}</span>
+              <span className="flex items-center gap-1"><Heart size={10} aria-hidden="true" className="text-purple-400" />{member.karma_score}</span>
             </div>
           </div>
         </div>
@@ -334,7 +334,7 @@ function MaintenanceTab({ tickets, members, isAdmin, onUpdateStatus, onAssign })
 
       {filtered.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-          <Wrench size={28} className="mx-auto text-gray-300 mb-2" />
+          <Wrench size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
           <p className="text-sm text-gray-600">
             Aucun ticket {filter === 'active' ? 'actif' : filter === 'done' ? 'terminé' : ''}
           </p>
@@ -428,7 +428,7 @@ export default function Domus() {
                 onClick={() => setShowCreateModal(true)}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
               >
-                <Plus size={16} /> Signaler
+                <Plus size={16} aria-hidden="true" /> Signaler
               </button>
             )}
           </div>
@@ -441,7 +441,7 @@ export default function Domus() {
                   onClick={copyInviteCode}
                   className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-indigo-100 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition"
                 >
-                  {inviteCopied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                  {inviteCopied ? <Check size={14} aria-hidden="true" className="text-green-600" /> : <Copy size={14} aria-hidden="true" />}
                   {inviteCopied ? 'Copié !' : 'Copier'}
                 </button>
               </div>

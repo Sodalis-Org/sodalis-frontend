@@ -57,7 +57,7 @@ export function NotificationBell({ onClick }) {
       aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}` : 'Notifications'}
       className="relative w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition shadow-sm"
     >
-      <Bell size={17} />
+      <Bell size={17} aria-hidden="true" />
       {unreadCount > 0 && (
         <span aria-hidden="true" className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
           {unreadCount > 99 ? '99+' : unreadCount}
@@ -126,7 +126,7 @@ export function NotificationDrawer({ open, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-12 pb-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            <Bell size={18} className="text-indigo-600" />
+            <Bell size={18} aria-hidden="true" className="text-indigo-600" />
             <h2 id={titleId} className="text-base font-bold text-gray-900">Notifications</h2>
             {unreadCount === 0 && liveNotifs.length > 0 && (
               <span className="text-xs text-gray-600">(tout lu)</span>
@@ -139,14 +139,14 @@ export function NotificationDrawer({ open, onClose }) {
               aria-label="Rafraîchir les notifications"
               className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
-              <RefreshCw size={14} />
+              <RefreshCw size={14} aria-hidden="true" />
             </button>
             <button
               onClick={onClose}
               aria-label="Fermer les notifications"
               className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
-              <X size={16} />
+              <X size={16} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -155,7 +155,7 @@ export function NotificationDrawer({ open, onClose }) {
         <div className="flex-1 overflow-y-auto">
           {merged.length === 0 && !loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
-              <Bell size={36} className="text-gray-200" />
+              <Bell size={36} aria-hidden="true" className="text-gray-200" />
               <p className="text-sm text-gray-600">Aucune notification pour le moment.</p>
               <p className="text-xs text-gray-300">Les événements de la colocation apparaîtront ici en temps réel.</p>
             </div>
@@ -182,7 +182,7 @@ export function NotificationDrawer({ open, onClose }) {
                       isLive ? 'bg-indigo-50/30' : 'bg-white'
                     )}
                   >
-                    <span className="text-xl leading-none mt-0.5 shrink-0">
+                    <span aria-hidden="true" className="text-xl leading-none mt-0.5 shrink-0">
                       {NOTIF_ICONS[notif.type] ?? '📣'}
                     </span>
                     <div className="flex-1 min-w-0">
@@ -261,7 +261,7 @@ function SocketStatus() {
     <div className={clsx('flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium',
       connected ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-600'
     )}>
-      {connected ? <Wifi size={11} /> : <WifiOff size={11} />}
+      {connected ? <Wifi size={11} aria-hidden="true" /> : <WifiOff size={11} aria-hidden="true" />}
       {connected ? 'Live' : 'Hors ligne'}
     </div>
   )

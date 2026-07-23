@@ -18,7 +18,7 @@ export default function Modal({ title, onClose, children }) {
         <div className="flex items-center justify-between">
           <h2 id={titleId} className="text-base font-bold text-gray-900">{title}</h2>
           <button onClick={onClose} aria-label="Fermer" className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
-            <X size={16} />
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
         {children}

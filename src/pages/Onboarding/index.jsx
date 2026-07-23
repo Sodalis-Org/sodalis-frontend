@@ -14,7 +14,7 @@ function ErrorBanner({ message }) {
   if (!message) return null
   return (
     <div role="alert" className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
-      <AlertCircle size={16} className="mt-0.5 shrink-0" />
+      <AlertCircle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
       <span>{message}</span>
     </div>
   )
@@ -84,8 +84,8 @@ function AuthStep() {
         value={mode}
         onChange={(v) => { setMode(v); setError(null) }}
         options={[
-          { value: 'login',    label: 'Se connecter', icon: <LogIn size={14} /> },
-          { value: 'register', label: "S'inscrire",   icon: <UserPlus size={14} /> },
+          { value: 'login',    label: 'Se connecter', icon: <LogIn size={14} aria-hidden="true" /> },
+          { value: 'register', label: "S'inscrire",   icon: <UserPlus size={14} aria-hidden="true" /> },
         ]}
       />
 
@@ -193,7 +193,7 @@ function ColocStep() {
             onClick={copyInvite}
             className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
           >
-            {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+            {copied ? <Check size={14} aria-hidden="true" className="text-green-600" /> : <Copy size={14} aria-hidden="true" />}
             {copied ? 'Copié' : 'Copier'}
           </button>
         </div>
@@ -221,8 +221,8 @@ function ColocStep() {
           setCreatedColoc(null)
         }}
         options={[
-          { value: 'create', label: 'Créer une coloc', icon: <Plus size={14} /> },
-          { value: 'join',   label: 'Rejoindre',        icon: <Key size={14} /> },
+          { value: 'create', label: 'Créer une coloc', icon: <Plus size={14} aria-hidden="true" /> },
+          { value: 'join',   label: 'Rejoindre',        icon: <Key size={14} aria-hidden="true" /> },
         ]}
       />
 
@@ -285,7 +285,7 @@ export default function Onboarding({ colocStep = false }) {
         {/* Brand */}
         <div className="flex flex-col items-center mb-8 gap-3">
           <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg">
-            <Home size={28} className="text-white" strokeWidth={2} />
+            <Home size={28} aria-hidden="true" className="text-white" strokeWidth={2} />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Sodalis</h1>

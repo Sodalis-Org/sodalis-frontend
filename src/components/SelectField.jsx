@@ -19,7 +19,7 @@ export default function SelectField({ label, value, onChange, options, required 
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
-        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
+        <ChevronDown size={14} aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
       </div>
     </div>
   )
