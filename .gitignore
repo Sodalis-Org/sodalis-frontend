@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Test & quality tooling output
+coverage
+.lighthouseci
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

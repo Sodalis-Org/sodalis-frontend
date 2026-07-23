@@ -27,7 +27,8 @@ function InputField({ label, type = 'text', value, onChange, placeholder, autoCo
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600"
           >
             {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
@@ -72,7 +73,7 @@ function TabToggle({ options, value, onChange }) {
             'flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-medium transition-all',
             value === opt.value
               ? 'bg-white text-indigo-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+              : 'text-gray-600 hover:text-gray-700'
           )}
         >
           {opt.icon}

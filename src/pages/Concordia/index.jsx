@@ -99,8 +99,9 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
     <Modal title="Déposer une plainte" onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Message</label>
+          <label htmlFor="complaint-message" className="text-sm font-medium text-gray-700">Message</label>
           <textarea
+            id="complaint-message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
@@ -322,8 +323,9 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
     <Modal title="Nouveau sondage" onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Question</label>
+          <label htmlFor="poll-question" className="text-sm font-medium text-gray-700">Question</label>
           <input
+            id="poll-question"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             required
@@ -333,7 +335,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Options <span className="text-gray-400 font-normal">(2–6)</span></label>
+          <span className="text-sm font-medium text-gray-700">Options <span className="text-gray-400 font-normal">(2–6)</span></span>
           {options.map((opt, i) => (
             <div key={i} className="flex gap-2">
               <input

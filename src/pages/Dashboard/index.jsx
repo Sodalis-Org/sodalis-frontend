@@ -1,4 +1,4 @@
-import { RefreshCw, LogOut, Star, Heart, CheckSquare, AlertTriangle, Bell, Clock, ChevronRight, MessageSquare } from 'lucide-react'
+import { RefreshCw, LogOut, Star, Heart, CheckSquare, AlertTriangle, Bell, Clock, MessageSquare } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useDashboard } from '../../hooks/useDashboard'
 import { useAuth } from '../../hooks/useAuth'

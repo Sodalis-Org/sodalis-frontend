@@ -128,8 +128,9 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Titre</label>
+            <label htmlFor="ticket-title" className="text-sm font-medium text-gray-700">Titre</label>
             <input
+              id="ticket-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -140,10 +141,11 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
+            <label htmlFor="ticket-description" className="text-sm font-medium text-gray-700">
               Description <span className="text-gray-400 font-normal">(optionnel)</span>
             </label>
             <textarea
+              id="ticket-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Détails supplémentaires..."

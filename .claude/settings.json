@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/\" 2>/dev/null && echo \"---frontend---\" && ls -la \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-frontend\" && echo \"---package.json---\" && cat \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-frontend/package.json\")",
+      "Read(//Users/linerolt/Documents/Ynov/Web service/Sodalis/**)",
+      "Bash(cd \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-backend\" && ls -la && echo \"---services?---\" && find . -maxdepth 1 -type d | grep -v node_modules)",
+      "Read(//Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-backend/**)",
+      "Bash(cd \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-backend\" && echo \"=== package.json ===\" && cat package.json && echo \"=== eslint.config.js ===\" && cat eslint.config.js && echo \"=== .prettierrc ===\" && cat .prettierrc)",
+      "Bash(cd \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-backend\" && echo \"=== QUALITY.md ===\" && cat QUALITY.md)",
+      "Bash(cd \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-frontend\" && echo \"=== node version ===\" && node -v && echo \"=== src tree ===\" && find src -maxdepth 2 -type d && echo \"=== existing configs ===\" && ls -la | grep -iE \"eslint|prettier|vitest|lighthouse\" && echo \"=== .github ===\" && find .github -type f 2>/dev/null && echo \"=== backend .github workflows for reference ===\" && find \"../sodalis-backend/.github\" -type f 2>/dev/null)",
+      "Read(//Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-backend/.github/**)",
+      "Bash(cd \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-backend\" && find .github -type f && echo \"=== a service package.json \\(domus\\) ===\" && cat service-domus/package.json 2>/dev/null | head -40 && echo \"=== scripts dir ===\" && ls scripts/)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -c \"import json; print\\(json.load\\(open\\('package.json'\\)\\)['scripts']\\)\")",
+      "Bash(npm audit *)",
+      "Bash(npm view *)",
+      "Bash(npm ls *)",
+      "Bash(npx lhci *)",
+      "Bash(node -e ' *)",
+      "Bash(npx eslint *)",
+      "Bash(echo \"exit code: $?\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(npx prettier *)",
+      "Bash(git checkout *)",
+      "Bash(npx vitest *)",
+      "Bash(node -e \"console.log\\(typeof localStorage\\); console.log\\(Object.getOwnPropertyNames\\(Object.getPrototypeOf\\(localStorage||{}\\)\\)\\)\")",
+      "Bash(node -e \"console.log\\(process.allowedNodeEnvironmentFlags.has\\('--localstorage-file'\\)\\)\")",
+      "Bash(node --help)",
+      "Bash(node --v8-options)",
+      "Bash(node -e \"for \\(const f of process.allowedNodeEnvironmentFlags\\) { if \\(/storage/i.test\\(f\\)\\) console.log\\(f\\) }\")",
+      "Bash(NODE_OPTIONS=--no-experimental-webstorage npx vitest run tests/context/AuthContext.test.jsx)",
+      "Bash(grep -oE \"[0-9]{1,3}\\(\\\\.[0-9]+\\)?%\" coverage/lib/index.html)",
+      "Bash(grep -v \"^$\")",
+      "Bash(cd \"/Users/linerolt/Documents/Ynov/Web service/Sodalis/sodalis-frontend\" && which chromium chromium-browser google-chrome google-chrome-stable 2>&1; ls -d /Applications/*Chrome* /Applications/*Chromium* 2>&1)",
+      "Read(//Applications/**)",
+      "Bash(timeout 180 npx lhci autorun)",
+      "Bash(echo \"lint exit: $?\")",
+      "Bash(rm -rf .lighthouseci)"
+    ]
+  }
+}

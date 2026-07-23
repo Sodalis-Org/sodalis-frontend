@@ -103,8 +103,10 @@ export function NotificationDrawer({ open, onClose }) {
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+      <button
+        type="button"
+        aria-label="Fermer"
+        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm cursor-default"
         onClick={onClose}
       />
 

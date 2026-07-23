@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import {
-  Briefcase, Plus, X, Clock, CheckCircle2, Circle,
+  Plus, X, Clock, CheckCircle2, Circle,
   ArrowRight, RotateCcw, ChevronDown, AlertTriangle,
-  Loader2, Star, User, CalendarDays
+  Loader2, Star, CalendarDays
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useLabor } from '../../hooks/useLabor'
@@ -107,8 +107,9 @@ function CreateTaskModal({ onClose, onCreate, loading, error, members }) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Titre</label>
+            <label htmlFor="task-title" className="text-sm font-medium text-gray-700">Titre</label>
             <input
+              id="task-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -127,11 +128,12 @@ function CreateTaskModal({ onClose, onCreate, loading, error, members }) {
           />
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
+            <label htmlFor="task-due-at" className="text-sm font-medium text-gray-700">
               Date limite <span className="text-gray-400 font-normal">(optionnel)</span>
             </label>
             <div className="relative">
               <input
+                id="task-due-at"
                 type="date"
                 value={dueAt}
                 onChange={(e) => setDueAt(e.target.value)}
