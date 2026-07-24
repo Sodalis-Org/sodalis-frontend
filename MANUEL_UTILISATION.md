@@ -40,6 +40,8 @@ Une cloche de notification est visible en permanence en haut à droite de l'écr
 
 ## 3. Accueil (tableau de bord)
 
+![Écran Accueil — tableau de bord](docs/captures/accueil.png)
+
 Le tableau de bord affiche, dans l'ordre :
 
 - Votre nom et un résumé de vos deux scores : le **score d'harmonie** (fiabilité — augmente quand vous terminez vos tâches ménagères, davantage si c'est dans les délais) et le **score de karma** (vie sociale — augmente quand on vous remercie, quand vous votez à un sondage, ou quand vous résolvez une plainte).
@@ -55,6 +57,8 @@ Si le chargement échoue, un bouton **« Réessayer »** est proposé.
 
 ## 4. Corvées (maintenance et tâches ménagères)
 
+![Écran Corvées — tickets de maintenance et tâches ménagères](docs/captures/corvee.png)
+
 ### Signaler et suivre un problème de maintenance
 
 Appuyez sur le bouton **« + »** en haut à droite (bulle ronde). Une fenêtre s'ouvre pour créer soit un ticket de maintenance (ex. plomberie, électricité, panne d'appareil), soit une tâche ménagère classique. Pour un ticket de maintenance, précisez un titre, une catégorie, et un niveau de priorité — un ticket marqué **« Urgent »** apparaît épinglé en haut de la page, dans la section « Urgences maintenance », et déclenche automatiquement la création d'une tâche de suivi pour que quelqu'un s'en occupe sans délai.
@@ -68,6 +72,8 @@ Depuis la même fenêtre « + », choisissez l'onglet tâche ménagère : titre,
 ---
 
 ## 5. Chez nous (vie sociale)
+
+![Écran Chez nous — plaintes, sondages, karma](docs/captures/chez-nous.png)
 
 Cet écran rassemble trois usages, accessibles depuis la barre d'actions en bas de l'écran :
 
@@ -84,6 +90,8 @@ La cloche visible en permanence en haut à droite affiche un badge avec le nombr
 ---
 
 ## 7. Profil, colocation et rôles
+
+![Écran Profil — informations, code d'invitation, membres](docs/captures/profil.png)
 
 L'écran Profil regroupe :
 
