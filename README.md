@@ -41,15 +41,12 @@ Le frontend ne contacte **jamais** les services `service-domus` / `service-labor
 
 ## Authentification
 
-- Le JWT est stocké localement.
-- Le token doit être **remplacé** après les mutations `createColoc` et `joinColoc` (elles renvoient un nouveau token avec un `coloc_id` mis à jour).
-- Toutes les requêtes authentifiées doivent envoyer :
+- Le JWT vit dans un cookie `httpOnly`/`SameSite=Strict` posé par la Gateway (`login`, `createColoc`, `joinColoc`) : le frontend ne le lit ni ne le stocke jamais lui-même.
+- Toutes les requêtes envoient `credentials: 'include'` pour que le cookie parte automatiquement — aucun header `Authorization` géré côté client.
+- Après un rechargement de page, la query `me` réhydrate l'état de connexion depuis le cookie (le token n'est pas lisible en JavaScript).
+- Après `createColoc` et `joinColoc`, le cookie est déjà mis à jour côté serveur avec le `coloc_id` courant ; le frontend appelle simplement `refreshUser()` (relance `me`) plutôt que de décoder un token retourné.
 
-```
-Authorization: Bearer <token>
-```
-
-L’intégration est centralisée dans `src/lib/apolloClient.js`.
+L’intégration est centralisée dans `src/lib/apolloClient.js` (Apollo Client) et `src/context/AuthContext.jsx` (réhydratation, `refreshUser`, `logout`).
 
 ## Architecture (MVC)
 
@@ -65,10 +62,14 @@ Règle : les pages et composants **n’importent pas** `src/graphql/` directemen
 
 Le layout racine est dans `src/App.jsx` avec une barre de navigation basse fixe. Les routes principales :
 
-- `/` : Dashboard
-- `/domus` : Domus
-- `/labor` : Labor
-- `/concordia` : Concordia
+- `/onboarding` : connexion / inscription
+- `/onboarding/coloc` : créer ou rejoindre une colocation (étape suivant l'inscription si l'utilisateur n'a pas encore de `coloc_id`)
+- `/` : Dashboard (tableau de bord agrégé)
+- `/chores` : Corvées & maintenance (tickets de maintenance et tâches ménagères — Domus et Labor sont fusionnés dans cette page unique côté frontend)
+- `/concordia` : plaintes, sondages, karma
+- `/profile` : informations du compte, de la colocation (code d'invitation, membres) et actions ADMIN
+
+Chaque route sous `/`, `/chores`, `/concordia`, `/profile` est protégée par `PrivateRoute` (`src/App.jsx`), qui redirige vers `/onboarding` ou `/onboarding/coloc` selon `src/lib/routeGuard.js`.
 
 ## Référence API
 
