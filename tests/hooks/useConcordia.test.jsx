@@ -10,6 +10,7 @@ import {
   VOTE_POLL,
   THANK_USER,
   GET_MY_RECENT_THANKS,
+  GET_COLOC_THANKS,
 } from '../../src/graphql/concordia'
 import { useConcordia } from '../../src/hooks/useConcordia'
 import { setAuthUser, resetAuthUser, makeWrapper } from '../utils.jsx'
@@ -33,6 +34,10 @@ function baseMocks() {
     {
       request: { query: GET_MY_RECENT_THANKS, variables: { colocId } },
       result: { data: { myRecentThanks: [] } },
+    },
+    {
+      request: { query: GET_COLOC_THANKS, variables: { colocId } },
+      result: { data: { colocThanks: [] } },
     },
   ]
 }
@@ -173,6 +178,10 @@ describe('useConcordia', () => {
       {
         request: { query: GET_MY_RECENT_THANKS, variables: { colocId } },
         result: { data: { myRecentThanks: [{ to_id: 'u2', createdAt: new Date().toISOString() }] } },
+      },
+      {
+        request: { query: GET_COLOC_THANKS, variables: { colocId } },
+        result: { data: { colocThanks: [{ id: 't1', from_id: 'u1', to_id: 'u2', createdAt: new Date().toISOString() }] } },
       },
     ]
     const { result } = renderHook(() => useConcordia(), { wrapper: makeWrapper(mocks) })

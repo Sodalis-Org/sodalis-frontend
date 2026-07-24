@@ -28,6 +28,6 @@ describe('getAvatarColorClass', () => {
   })
 
   it('falls back to the first color when name is undefined', () => {
-    expect(getAvatarColorClass(undefined)).toBe('bg-indigo-100 text-indigo-700')
+    expect(getAvatarColorClass(undefined)).toBe('bg-primary/15 text-primary')
   })
 })

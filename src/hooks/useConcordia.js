@@ -5,7 +5,7 @@ import { GET_USERS_BY_COLOC } from '../graphql/users'
 import {
   GET_COMPLAINTS, CREATE_COMPLAINT, RESOLVE_COMPLAINT, DELETE_COMPLAINT,
   GET_POLLS, CREATE_POLL, VOTE_POLL, CLOSE_POLL,
-  GET_MY_RECENT_THANKS, THANK_USER,
+  GET_MY_RECENT_THANKS, GET_COLOC_THANKS, THANK_USER,
 } from '../graphql/concordia'
 
 export function useConcordia() {
@@ -37,6 +37,11 @@ export function useConcordia() {
   })
 
   const { data: thanksData, refetch: refetchThanks } = useQuery(GET_MY_RECENT_THANKS, {
+    variables: { colocId },
+    skip: !colocId,
+  })
+
+  const { data: colocThanksData, refetch: refetchColocThanks } = useQuery(GET_COLOC_THANKS, {
     variables: { colocId },
     skip: !colocId,
   })
@@ -75,6 +80,7 @@ export function useConcordia() {
     refetchQueries: [
       { query: GET_USERS_BY_COLOC, variables: { colocId } },
       { query: GET_MY_RECENT_THANKS, variables: { colocId } },
+      { query: GET_COLOC_THANKS, variables: { colocId } },
     ],
   })
 
@@ -161,12 +167,13 @@ export function useConcordia() {
   const complaints = complaintsData?.complaints ?? []
   const polls      = pollsData?.polls ?? []
   const recentThanks = thanksData?.myRecentThanks ?? []
+  const colocThanks  = colocThanksData?.colocThanks ?? []
 
   return {
     loading: authLoading || complaintsLoading || pollsLoading,
     error: usersError || complaintsError || pollsError || null,
     refetch: async () => {
-      await Promise.all([refetchUsers(), refetchComplaints(), refetchPolls(), refetchThanks()])
+      await Promise.all([refetchUsers(), refetchComplaints(), refetchPolls(), refetchThanks(), refetchColocThanks()])
     },
     createComplaintLoading,
     createPollLoading,
@@ -180,6 +187,7 @@ export function useConcordia() {
     complaints,
     polls,
     recentThanks,
+    colocThanks,
     currentUserId,
     isAdmin,
     createComplaint,

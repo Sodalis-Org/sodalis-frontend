@@ -125,6 +125,17 @@ export const GET_MY_RECENT_THANKS = gql`
   }
 `
 
+export const GET_COLOC_THANKS = gql`
+  query GetColocThanks($colocId: ID!) {
+    colocThanks(colocId: $colocId) {
+      id
+      from_id
+      to_id
+      createdAt
+    }
+  }
+`
+
 export const THANK_USER = gql`
   mutation ThankUser($target_id: ID!) {
     thankUser(target_id: $target_id) {
