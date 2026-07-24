@@ -73,11 +73,12 @@ npm run dev
 
 Le frontend **ne contacte jamais** `service-domus` ou `service-labor` directement : tout passe par la **Gateway GraphQL** (`:4000/graphql`).
 
-### Auth (JWT)
+### Auth (cookie httpOnly)
 
-- Le frontend stocke le JWT localement et l’envoie sur chaque requête :
-  - `Authorization: Bearer <token>`
-- Après `createColoc` et `joinColoc`, le token doit être **remplacé** (un nouveau token est renvoyé avec un `coloc_id` mis à jour).
+- Le JWT vit dans un cookie `httpOnly`/`SameSite=Strict` posé par la Gateway ; le frontend ne le lit ni ne le stocke jamais lui-même — aucun header `Authorization` géré côté client, Apollo Client envoie `credentials: 'include'`.
+- Après un rechargement de page, la query `me` réhydrate l'état de connexion depuis le cookie (illisible en JavaScript).
+- Après `createColoc` et `joinColoc`, le cookie est déjà mis à jour côté serveur avec le `coloc_id` courant ; le frontend relance simplement `me` (`refreshUser()`) plutôt que de décoder un token retourné.
+- La mutation `logout` révoque le jeton côté serveur (liste noire Redis) avant d'effacer le cookie.
 
 ### Temps réel (Socket.io)
 
