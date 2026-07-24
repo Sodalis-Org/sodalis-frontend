@@ -4,8 +4,8 @@ import { useAuthContext } from '../context/AuthContext'
 import { GET_USERS_BY_COLOC } from '../graphql/users'
 import {
   GET_COMPLAINTS, CREATE_COMPLAINT, RESOLVE_COMPLAINT, DELETE_COMPLAINT,
-  GET_POLLS, CREATE_POLL, VOTE_POLL,
-  THANK_USER,
+  GET_POLLS, CREATE_POLL, VOTE_POLL, CLOSE_POLL,
+  GET_MY_RECENT_THANKS, THANK_USER,
 } from '../graphql/concordia'
 
 export function useConcordia() {
@@ -17,20 +17,26 @@ export function useConcordia() {
   const [complaintError, setComplaintError] = useState(null)
   const [pollError, setPollError] = useState(null)
   const [karmaFeedback, setKarmaFeedback] = useState(null)
+  const [karmaError, setKarmaError] = useState(null)
 
   // ── Queries ──────────────────────────────────────────────────────────────────
 
-  const { data: usersData } = useQuery(GET_USERS_BY_COLOC, {
+  const { data: usersData, error: usersError, refetch: refetchUsers } = useQuery(GET_USERS_BY_COLOC, {
     variables: { colocId },
     skip: !colocId,
   })
 
-  const { data: complaintsData, loading: complaintsLoading, refetch: refetchComplaints } = useQuery(GET_COMPLAINTS, {
+  const { data: complaintsData, loading: complaintsLoading, error: complaintsError, refetch: refetchComplaints } = useQuery(GET_COMPLAINTS, {
     variables: { colocId },
     skip: !colocId,
   })
 
-  const { data: pollsData, loading: pollsLoading, refetch: refetchPolls } = useQuery(GET_POLLS, {
+  const { data: pollsData, loading: pollsLoading, error: pollsError, refetch: refetchPolls } = useQuery(GET_POLLS, {
+    variables: { colocId },
+    skip: !colocId,
+  })
+
+  const { data: thanksData, refetch: refetchThanks } = useQuery(GET_MY_RECENT_THANKS, {
     variables: { colocId },
     skip: !colocId,
   })
@@ -59,9 +65,18 @@ export function useConcordia() {
     refetchQueries: [{ query: GET_POLLS, variables: { colocId } }],
   })
 
+  const [closePollMutation] = useMutation(CLOSE_POLL, {
+    refetchQueries: [{ query: GET_POLLS, variables: { colocId } }],
+  })
+
   // ── Karma mutation ────────────────────────────────────────────────────────────
 
-  const [thankUserMutation] = useMutation(THANK_USER)
+  const [thankUserMutation] = useMutation(THANK_USER, {
+    refetchQueries: [
+      { query: GET_USERS_BY_COLOC, variables: { colocId } },
+      { query: GET_MY_RECENT_THANKS, variables: { colocId } },
+    ],
+  })
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
@@ -123,22 +138,36 @@ export function useConcordia() {
     }
   }
 
+  const closePoll = async (id) => {
+    try {
+      await closePollMutation({ variables: { id } })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const thankUser = async (target_id, targetName) => {
+    setKarmaError(null)
     try {
       const { data } = await thankUserMutation({ variables: { target_id } })
       setKarmaFeedback({ name: targetName, score: data.thankUser.score })
       setTimeout(() => setKarmaFeedback(null), 3500)
     } catch (e) {
-      console.error(e)
+      setKarmaError(e.graphQLErrors?.[0]?.message ?? e.message)
     }
   }
 
   const members    = usersData?.usersByColoc ?? []
   const complaints = complaintsData?.complaints ?? []
   const polls      = pollsData?.polls ?? []
+  const recentThanks = thanksData?.myRecentThanks ?? []
 
   return {
     loading: authLoading || complaintsLoading || pollsLoading,
+    error: usersError || complaintsError || pollsError || null,
+    refetch: async () => {
+      await Promise.all([refetchUsers(), refetchComplaints(), refetchPolls(), refetchThanks()])
+    },
     createComplaintLoading,
     createPollLoading,
     complaintError,
@@ -146,9 +175,11 @@ export function useConcordia() {
     pollError,
     setPollError,
     karmaFeedback,
+    karmaError,
     members,
     complaints,
     polls,
+    recentThanks,
     currentUserId,
     isAdmin,
     createComplaint,
@@ -156,6 +187,7 @@ export function useConcordia() {
     deleteComplaint,
     createPoll,
     votePoll,
+    closePoll,
     thankUser,
     refetchComplaints,
     refetchPolls,

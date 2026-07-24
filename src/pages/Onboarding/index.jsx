@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Home, LogIn, UserPlus, Key, Plus, AlertCircle, Copy, Check } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -143,22 +144,25 @@ function AuthStep() {
 
 // ─── Step 2 : Coloc setup ─────────────────────────────────────────────────────
 
-function ColocStep() {
+function ColocStep({ createdColoc, setCreatedColoc }) {
   const navigate = useNavigate()
   const [mode, setMode] = useState('create')
   const { createColoc, joinColoc, error, setError, loading } = useAuth()
-  const { logout } = useAuthContext()
+  const { logout, refreshUser } = useAuthContext()
 
   const [colocName, setColocName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
-  const [createdColoc, setCreatedColoc] = useState(null)
   const [copied, setCopied] = useState(false)
+  const [continuing, setContinuing] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (mode === 'create') {
       const coloc = await createColoc(colocName.trim())
-      if (coloc) setCreatedColoc(coloc)
+      if (!coloc) return
+      // Pose l'écran invite avant refreshUser pour que le garde Onboarding ne redirige pas.
+      flushSync(() => setCreatedColoc(coloc))
+      await refreshUser()
     } else {
       await joinColoc(inviteCode.trim())
     }
@@ -172,6 +176,22 @@ function ColocStep() {
       setTimeout(() => setCopied(false), 2000)
     } catch {
       /* ignore */
+    }
+  }
+
+  const handleContinue = async () => {
+    setContinuing(true)
+    setError(null)
+    try {
+      const result = await refreshUser()
+      const colocId = result?.data?.me?.coloc_id
+      if (!colocId) {
+        setError('Session incomplète — reconnectez-vous ou réessayez.')
+        return
+      }
+      navigate('/')
+    } finally {
+      setContinuing(false)
     }
   }
 
@@ -197,7 +217,8 @@ function ColocStep() {
             {copied ? 'Copié' : 'Copier'}
           </button>
         </div>
-        <PrimaryButton type="button" onClick={() => navigate('/')}>
+        <ErrorBanner message={error} />
+        <PrimaryButton type="button" loading={continuing} onClick={handleContinue}>
           Continuer
         </PrimaryButton>
         <button
@@ -267,9 +288,11 @@ function ColocStep() {
 export default function Onboarding({ colocStep = false }) {
   useDocumentTitle(colocStep ? 'Configurer ma colocation' : 'Connexion')
   const { user, loading } = useAuthContext()
+  // Lifted so the redirect guard can keep the invite screen visible after refreshUser().
+  const [createdColoc, setCreatedColoc] = useState(null)
 
   if (loading) return null
-  if (user && user.coloc_id) return <Navigate to="/" replace />
+  if (user?.coloc_id && !createdColoc) return <Navigate to="/" replace />
   if (colocStep && !user) return <Navigate to="/onboarding" replace />
   if (!colocStep && user && !user.coloc_id) return <Navigate to="/onboarding/coloc" replace />
 
@@ -302,7 +325,7 @@ export default function Onboarding({ colocStep = false }) {
           {colocStep ? (
             <>
               <h2 className="text-base font-semibold text-gray-800 mb-4">Votre colocation</h2>
-              <ColocStep />
+              <ColocStep createdColoc={createdColoc} setCreatedColoc={setCreatedColoc} />
             </>
           ) : (
             <>

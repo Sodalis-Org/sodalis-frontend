@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom'
-import { LayoutDashboard, Home, Briefcase, Users } from 'lucide-react'
+import { Routes, Route, NavLink, useLocation, Navigate, Link } from 'react-router-dom'
+import { LayoutDashboard, Home, Briefcase, Users, User } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useAuthContext } from './context/AuthContext'
 import { getPrivateRedirect } from './lib/routeGuard'
@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard'
 import Domus from './pages/Domus'
 import Labor from './pages/Labor'
 import Concordia from './pages/Concordia'
+import Profile from './pages/Profile'
 import Onboarding from './pages/Onboarding'
 
 const NAV_ITEMS = [
@@ -52,6 +53,9 @@ function PrivateRoute({ children }) {
 
 function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const location = useLocation()
+  const profileActive = location.pathname.startsWith('/profile')
+
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
       <a
@@ -61,8 +65,19 @@ function AppLayout() {
         Aller au contenu principal
       </a>
 
-      {/* Global notification bell — fixed top-right */}
-      <div className="fixed top-4 right-4 z-30">
+      <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
+        <Link
+          to="/profile"
+          aria-label="Profil"
+          className={clsx(
+            'w-10 h-10 rounded-full border flex items-center justify-center transition',
+            profileActive
+              ? 'bg-indigo-600 border-indigo-600 text-white'
+              : 'bg-white border-gray-200 text-gray-600 hover:border-indigo-200 hover:text-indigo-600',
+          )}
+        >
+          <User size={18} aria-hidden="true" />
+        </Link>
         <NotificationBell onClick={() => setDrawerOpen(true)} />
       </div>
 
@@ -74,6 +89,7 @@ function AppLayout() {
           <Route path="/domus"     element={<PrivateRoute><Domus /></PrivateRoute>} />
           <Route path="/labor"     element={<PrivateRoute><Labor /></PrivateRoute>} />
           <Route path="/concordia" element={<PrivateRoute><Concordia /></PrivateRoute>} />
+          <Route path="/profile"   element={<PrivateRoute><Profile /></PrivateRoute>} />
         </Routes>
       </main>
       <BottomNav />

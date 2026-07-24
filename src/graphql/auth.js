@@ -75,3 +75,39 @@ export const GET_MY_COLOC = gql`
     }
   }
 `
+
+export const LEAVE_COLOC = gql`
+  mutation LeaveColoc {
+    leaveColoc {
+      ok
+    }
+  }
+`
+
+export const REGENERATE_INVITE_CODE = gql`
+  mutation RegenerateInviteCode {
+    regenerateInviteCode {
+      coloc {
+        id
+        name
+        invite_code
+      }
+    }
+  }
+`
+
+export const KICK_MEMBER = gql`
+  mutation KickMember($userId: ID!) {
+    kickMember(userId: $userId) {
+      ok
+    }
+  }
+`
+
+export const TRANSFER_ADMIN = gql`
+  mutation TransferAdmin($userId: ID!) {
+    transferAdmin(userId: $userId) {
+      ok
+    }
+  }
+`

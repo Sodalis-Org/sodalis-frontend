@@ -11,12 +11,12 @@ export function useLabor() {
   const [formError, setFormError] = useState(null)
   const [lastCompleted, setLastCompleted] = useState(null)
 
-  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS_BY_COLOC, {
+  const { data: tasksData, loading: tasksLoading, error: tasksError, refetch: refetchTasks } = useQuery(GET_TASKS_BY_COLOC, {
     variables: { colocId },
     skip: !colocId,
   })
 
-  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS_BY_COLOC, {
+  const { data: usersData, loading: usersLoading, error: usersError, refetch: refetchUsers } = useQuery(GET_USERS_BY_COLOC, {
     variables: { colocId },
     skip: !colocId,
   })
@@ -81,6 +81,10 @@ export function useLabor() {
 
   return {
     loading: authLoading || tasksLoading || usersLoading,
+    error: tasksError || usersError || null,
+    refetch: async () => {
+      await Promise.all([refetchTasks(), refetchUsers()])
+    },
     createLoading,
     formError,
     setFormError,

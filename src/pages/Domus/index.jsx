@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
   Users, Wrench, Plus, Star, Heart, ShieldCheck, User,
   Droplets, Zap, AirVent, Sofa, Wifi, HelpCircle,
-  ChevronDown, AlertTriangle, UserCheck, Copy, Check,
+  ChevronDown, AlertTriangle, UserCheck, Copy, Check, RefreshCw,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useDomus } from '../../hooks/useDomus'
@@ -11,6 +11,7 @@ import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import QueryErrorState from '../../components/QueryErrorState'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -263,39 +264,121 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
 
 // ─── Tab contents ─────────────────────────────────────────────────────────────
 
-function MembersTab({ members, currentUserId }) {
+function MembersTab({
+  members,
+  currentUserId,
+  isAdmin,
+  onKick,
+  onTransferAdmin,
+  actionError,
+}) {
+  const [pendingKick, setPendingKick] = useState(null)
+  const [pendingTransfer, setPendingTransfer] = useState(null)
+
   return (
     <div className="flex flex-col gap-2">
+      {actionError && (
+        <p role="alert" className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+          {actionError}
+        </p>
+      )}
       {members.map((member) => (
-        <div key={member.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3">
-          <div className="relative">
-            <Avatar name={member.name} />
-            {member.id === currentUserId && (
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-indigo-500 rounded-full border-2 border-white" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
-              {member.id === currentUserId && <span className="text-xs text-gray-600">(moi)</span>}
+        <div key={member.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Avatar name={member.name} />
+              {member.id === currentUserId && (
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-indigo-500 rounded-full border-2 border-white" />
+              )}
             </div>
-            <p className="text-xs text-gray-600 truncate mt-0.5">{member.email}</p>
-          </div>
-          <div className="flex flex-col items-end gap-1.5 shrink-0">
-            {member.role === 'ADMIN' ? (
-              <span className="flex items-center gap-1 text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">
-                <ShieldCheck size={11} aria-hidden="true" /> Admin
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">
-                <User size={11} aria-hidden="true" /> Membre
-              </span>
-            )}
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><Star size={10} aria-hidden="true" className="text-indigo-400" />{member.harmony_score}</span>
-              <span className="flex items-center gap-1"><Heart size={10} aria-hidden="true" className="text-purple-400" />{member.karma_score}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
+                {member.id === currentUserId && <span className="text-xs text-gray-600">(moi)</span>}
+              </div>
+              <p className="text-xs text-gray-600 truncate mt-0.5">{member.email}</p>
+            </div>
+            <div className="flex flex-col items-end gap-1.5 shrink-0">
+              {member.role === 'ADMIN' ? (
+                <span className="flex items-center gap-1 text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">
+                  <ShieldCheck size={11} aria-hidden="true" /> Admin
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">
+                  <User size={11} aria-hidden="true" /> Membre
+                </span>
+              )}
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <span className="flex items-center gap-1"><Star size={10} aria-hidden="true" className="text-indigo-400" />{member.harmony_score}</span>
+                <span className="flex items-center gap-1"><Heart size={10} aria-hidden="true" className="text-purple-400" />{member.karma_score}</span>
+              </div>
             </div>
           </div>
+
+          {isAdmin && member.id !== currentUserId && (
+            <div className="flex flex-wrap gap-2 pt-1 border-t border-gray-50">
+              {member.role !== 'ADMIN' && (
+                pendingTransfer === member.id ? (
+                  <div className="flex gap-2 w-full">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const ok = await onTransferAdmin(member.id)
+                        if (ok) setPendingTransfer(null)
+                      }}
+                      className="flex-1 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold"
+                    >
+                      Confirmer admin
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPendingTransfer(null)}
+                      className="flex-1 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-700"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { setPendingTransfer(member.id); setPendingKick(null) }}
+                    className="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold"
+                  >
+                    Nommer admin
+                  </button>
+                )
+              )}
+              {pendingKick === member.id ? (
+                <div className="flex gap-2 w-full">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const ok = await onKick(member.id)
+                      if (ok) setPendingKick(null)
+                    }}
+                    className="flex-1 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold"
+                  >
+                    Confirmer expulsion
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPendingKick(null)}
+                    className="flex-1 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-700"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => { setPendingKick(member.id); setPendingTransfer(null) }}
+                  className="px-3 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-semibold"
+                >
+                  Expulser
+                </button>
+              )}
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -362,12 +445,18 @@ export default function Domus() {
   const [activeTab, setActiveTab]       = useState('members')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [inviteCopied, setInviteCopied] = useState(false)
+  const [confirmRegen, setConfirmRegen] = useState(false)
 
   const {
     loading,
+    error,
+    refetch,
     createLoading,
+    regenerateLoading,
     formError,
     setFormError,
+    actionError,
+    setActionError,
     coloc,
     members,
     tickets,
@@ -376,6 +465,9 @@ export default function Domus() {
     createTicket,
     updateStatus,
     assignTicket,
+    regenerateInvite,
+    kickMember,
+    transferAdmin,
   } = useDomus()
 
   const activeTicketsCount = tickets.filter((t) => t.status === 'OPEN' || t.status === 'IN_PROGRESS').length
@@ -396,6 +488,11 @@ export default function Domus() {
     }
   }
 
+  const handleRegen = async () => {
+    const updated = await regenerateInvite()
+    if (updated) setConfirmRegen(false)
+  }
+
   if (loading) {
     return (
       <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
@@ -403,6 +500,10 @@ export default function Domus() {
         {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
+  }
+
+  if (error) {
+    return <QueryErrorState onRetry={() => refetch()} />
   }
 
   return (
@@ -432,18 +533,47 @@ export default function Domus() {
               </button>
             )}
           </div>
-          {coloc?.invite_code && (
+          {isAdmin && coloc?.invite_code && (
             <div className="mb-4 flex flex-col gap-2 rounded-2xl border border-indigo-100 bg-indigo-50/80 px-3.5 py-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-indigo-700">Code d&apos;invitation</span>
-                <button
-                  type="button"
-                  onClick={copyInviteCode}
-                  className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-indigo-100 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition"
-                >
-                  {inviteCopied ? <Check size={14} aria-hidden="true" className="text-green-600" /> : <Copy size={14} aria-hidden="true" />}
-                  {inviteCopied ? 'Copié !' : 'Copier'}
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={copyInviteCode}
+                    className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-indigo-100 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition"
+                  >
+                    {inviteCopied ? <Check size={14} aria-hidden="true" className="text-green-600" /> : <Copy size={14} aria-hidden="true" />}
+                    {inviteCopied ? 'Copié !' : 'Copier'}
+                  </button>
+                  {!confirmRegen ? (
+                    <button
+                      type="button"
+                      onClick={() => { setConfirmRegen(true); setActionError(null) }}
+                      className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-indigo-100 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition"
+                    >
+                      <RefreshCw size={14} aria-hidden="true" /> Régénérer
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        disabled={regenerateLoading}
+                        onClick={handleRegen}
+                        className="shrink-0 px-2.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold disabled:opacity-60"
+                      >
+                        OK
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmRegen(false)}
+                        className="shrink-0 px-2.5 py-1.5 rounded-lg border border-indigo-100 bg-white text-xs font-semibold text-indigo-700"
+                      >
+                        Non
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
               <code className="font-mono text-sm font-bold text-gray-900 tracking-tight break-all">
                 {coloc.invite_code}
@@ -451,6 +581,9 @@ export default function Domus() {
               <p className="text-xs text-indigo-900/70 leading-snug">
                 Envoyez ce code à vos colocataires pour qu&apos;ils rejoignent la colocation depuis l&apos;onboarding.
               </p>
+              {actionError && activeTab !== 'members' && (
+                <p role="alert" className="text-xs text-red-600">{actionError}</p>
+              )}
             </div>
           )}
           <TabBar tabs={tabs} active={activeTab} onChange={setActiveTab} />
@@ -458,7 +591,14 @@ export default function Domus() {
 
         <div className="px-4 pt-4 pb-4">
           {activeTab === 'members' ? (
-            <MembersTab members={members} currentUserId={currentUserId} />
+            <MembersTab
+              members={members}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
+              onKick={kickMember}
+              onTransferAdmin={transferAdmin}
+              actionError={actionError}
+            />
           ) : (
             <MaintenanceTab
               tickets={tickets}

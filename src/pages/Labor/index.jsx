@@ -11,6 +11,7 @@ import Avatar from '../../components/Avatar'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
+import QueryErrorState from '../../components/QueryErrorState'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -250,6 +251,8 @@ export default function Labor() {
 
   const {
     loading,
+    error,
+    refetch,
     createLoading,
     formError,
     setFormError,
@@ -277,6 +280,10 @@ export default function Labor() {
         {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
+  }
+
+  if (error) {
+    return <QueryErrorState onRetry={() => refetch()} />
   }
 
   return (

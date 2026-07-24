@@ -11,6 +11,7 @@ import Avatar from '../../components/Avatar'
 import Modal from '../../components/Modal'
 import SelectField from '../../components/SelectField'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import QueryErrorState from '../../components/QueryErrorState'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
@@ -23,6 +24,19 @@ function timeAgo(isoDate) {
   const h = Math.floor(m / 60)
   if (h < 24) return `il y a ${h} h`
   return `il y a ${Math.floor(h / 24)} j`
+}
+
+const THANK_COOLDOWN_MS = 24 * 60 * 60 * 1000
+
+function formatThankCooldown(createdAt) {
+  const availableAt = new Date(createdAt).getTime() + THANK_COOLDOWN_MS
+  const ms = availableAt - Date.now()
+  if (ms <= 0) return null
+  const h = Math.floor(ms / 3600000)
+  const m = Math.max(1, Math.ceil((ms % 3600000) / 60000))
+  if (h >= 20) return 'Demain'
+  if (h > 0) return `Dans ${h} h`
+  return `Dans ${m} min`
 }
 
 // ─── Karma toast ──────────────────────────────────────────────────────────────
@@ -350,11 +364,12 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
   )
 }
 
-function PollCard({ poll, currentUserId, onVote }) {
+function PollCard({ poll, currentUserId, isAdmin, onVote, onClose }) {
   const totalVotes    = poll.options.reduce((sum, o) => sum + o.voters.length, 0)
   const userVotedOn   = poll.options.find((o) => o.voters.includes(currentUserId))
   const isClosed      = poll.status === 'CLOSED'
   const winnerCount   = Math.max(...poll.options.map((o) => o.voters.length))
+  const canClose      = !isClosed && (isAdmin || poll.creator_id === currentUserId)
 
   return (
     <div className={clsx('bg-white rounded-2xl border p-4 flex flex-col gap-3', isClosed ? 'border-gray-100' : 'border-gray-200')}>
@@ -422,7 +437,18 @@ function PollCard({ poll, currentUserId, onVote }) {
       {/* Footer */}
       <div className="flex items-center justify-between text-xs text-gray-600">
         <span>{totalVotes} vote{totalVotes > 1 ? 's' : ''}</span>
-        <span>{timeAgo(poll.createdAt)}</span>
+        <div className="flex items-center gap-2">
+          <span>{timeAgo(poll.createdAt)}</span>
+          {canClose && (
+            <button
+              type="button"
+              onClick={() => onClose(poll.id)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-700 text-xs font-medium hover:bg-gray-100 transition"
+            >
+              <Lock size={12} aria-hidden="true" /> Fermer
+            </button>
+          )}
+        </div>
       </div>
 
       {!isClosed && !userVotedOn && (
@@ -432,7 +458,7 @@ function PollCard({ poll, currentUserId, onVote }) {
   )
 }
 
-function PollsTab({ polls, currentUserId, onVote, onCreate, createLoading, error, setError }) {
+function PollsTab({ polls, currentUserId, isAdmin, onVote, onClose, onCreate, createLoading, error, setError }) {
   const [showModal, setShowModal] = useState(false)
   const [filter, setFilter]       = useState('open')
 
@@ -481,7 +507,14 @@ function PollsTab({ polls, currentUserId, onVote, onCreate, createLoading, error
           </div>
         ) : (
           filtered.map((poll) => (
-            <PollCard key={poll.id} poll={poll} currentUserId={currentUserId} onVote={onVote} />
+            <PollCard
+              key={poll.id}
+              poll={poll}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
+              onVote={onVote}
+              onClose={onClose}
+            />
           ))
         )}
       </div>
@@ -491,8 +524,15 @@ function PollsTab({ polls, currentUserId, onVote, onCreate, createLoading, error
 
 // ─── KARMA ────────────────────────────────────────────────────────────────────
 
-function KarmaTab({ members, currentUserId, onThank }) {
+function KarmaTab({ members, currentUserId, recentThanks, onThank, karmaError }) {
   const [thankingId, setThankingId] = useState(null)
+
+  const cooldownByTarget = {}
+  for (const thank of recentThanks) {
+    if (cooldownByTarget[thank.to_id]) continue
+    const label = formatThankCooldown(thank.createdAt)
+    if (label) cooldownByTarget[thank.to_id] = label
+  }
 
   const handleThank = async (member) => {
     setThankingId(member.id)
@@ -504,34 +544,48 @@ function KarmaTab({ members, currentUserId, onThank }) {
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-2 p-3 rounded-xl bg-purple-50 border border-purple-100 text-purple-700 text-xs">
         <Sparkles size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
-        <span>Remerciez un colocataire pour une bonne action — il reçoit <strong>+3 Karma</strong>.</span>
+        <span>1 remerciement par personne toutes les 24 h · la cible reçoit <strong>+3 Karma</strong>.</span>
       </div>
+
+      {karmaError && (
+        <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5 px-1">
+          <AlertTriangle size={13} aria-hidden="true" /> {karmaError}
+        </p>
+      )}
 
       {[...members]
         .filter((m) => m.id !== currentUserId)
         .sort((a, b) => b.karma_score - a.karma_score)
-        .map((member) => (
-          <div key={member.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3">
-            <Avatar name={member.name} size="sm" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
-              <div className="flex items-center gap-1 mt-0.5">
-                <Heart size={11} aria-hidden="true" className="text-purple-400" />
-                <span className="text-xs text-purple-600 font-medium">{member.karma_score} karma</span>
+        .map((member) => {
+          const cooldownLabel = cooldownByTarget[member.id]
+          const isThanking = thankingId === member.id
+          const disabled = isThanking || Boolean(cooldownLabel)
+
+          return (
+            <div key={member.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3">
+              <Avatar name={member.name} size="sm" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <Heart size={11} aria-hidden="true" className="text-purple-400" />
+                  <span className="text-xs text-purple-600 font-medium">{member.karma_score} karma</span>
+                </div>
               </div>
+              <button
+                onClick={() => handleThank(member)}
+                disabled={disabled}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 text-purple-600 text-xs font-semibold hover:bg-purple-100 disabled:opacity-50 transition"
+              >
+                {isThanking
+                  ? <LoadingSpinner size={13} />
+                  : cooldownLabel
+                    ? cooldownLabel
+                    : <><Heart size={13} aria-hidden="true" /> Remercier</>
+                }
+              </button>
             </div>
-            <button
-              onClick={() => handleThank(member)}
-              disabled={thankingId === member.id}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 text-purple-600 text-xs font-semibold hover:bg-purple-100 disabled:opacity-50 transition"
-            >
-              {thankingId === member.id
-                ? <LoadingSpinner size={13} />
-                : <><Heart size={13} aria-hidden="true" /> Remercier</>
-              }
-            </button>
-          </div>
-        ))}
+          )
+        })}
     </div>
   )
 }
@@ -550,6 +604,8 @@ export default function Concordia() {
 
   const {
     loading,
+    error,
+    refetch,
     createComplaintLoading,
     createPollLoading,
     complaintError,
@@ -557,9 +613,11 @@ export default function Concordia() {
     pollError,
     setPollError,
     karmaFeedback,
+    karmaError,
     members,
     complaints,
     polls,
+    recentThanks,
     currentUserId,
     isAdmin,
     createComplaint,
@@ -567,6 +625,7 @@ export default function Concordia() {
     deleteComplaint,
     createPoll,
     votePoll,
+    closePoll,
     thankUser,
   } = useConcordia()
 
@@ -577,6 +636,10 @@ export default function Concordia() {
         {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
+  }
+
+  if (error) {
+    return <QueryErrorState onRetry={() => refetch()} />
   }
 
   return (
@@ -629,7 +692,9 @@ export default function Concordia() {
             <PollsTab
               polls={polls}
               currentUserId={currentUserId}
+              isAdmin={isAdmin}
               onVote={votePoll}
+              onClose={closePoll}
               onCreate={createPoll}
               createLoading={createPollLoading}
               error={pollError}
@@ -640,7 +705,9 @@ export default function Concordia() {
             <KarmaTab
               members={members}
               currentUserId={currentUserId}
+              recentThanks={recentThanks}
               onThank={thankUser}
+              karmaError={karmaError}
             />
           )}
         </div>
