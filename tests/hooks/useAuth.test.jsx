@@ -105,18 +105,12 @@ describe('useAuth', () => {
     expect(navigateMock).toHaveBeenCalledWith('/')
   })
 
-  it('createColoc: returns the created coloc and refreshes the user', async () => {
+  it('createColoc: returns the created coloc without refreshing the user yet', async () => {
     const mocks = [
       {
         request: { query: CREATE_COLOC, variables: { name: 'Maison' } },
         result: {
           data: { createColoc: { coloc: { id: 'c9', name: 'Maison', invite_code: 'XYZ' } } },
-        },
-      },
-      {
-        request: { query: ME },
-        result: {
-          data: { me: { id: 'u1', name: 'A', email: 'a@b.com', role: 'ADMIN', coloc_id: 'c9' } },
         },
       },
     ]
@@ -129,7 +123,8 @@ describe('useAuth', () => {
     })
 
     expect(coloc).toEqual({ id: 'c9', name: 'Maison', invite_code: 'XYZ' })
-    expect(result.current.context.user.coloc_id).toBe('c9')
+    // refreshUser is deferred to Continuer so the invite screen can render
+    expect(result.current.context.user).toBeNull()
   })
 
   it('joinColoc: navigates home after refreshing the user', async () => {

@@ -104,7 +104,37 @@ export const VOTE_POLL = gql`
   }
 `
 
+export const CLOSE_POLL = gql`
+  mutation ClosePoll($id: ID!) {
+    closePoll(id: $id) {
+      id
+      status
+      createdAt
+    }
+  }
+`
+
 // ─── Karma ────────────────────────────────────────────────────────────────────
+
+export const GET_MY_RECENT_THANKS = gql`
+  query GetMyRecentThanks($colocId: ID!) {
+    myRecentThanks(colocId: $colocId) {
+      to_id
+      createdAt
+    }
+  }
+`
+
+export const GET_COLOC_THANKS = gql`
+  query GetColocThanks($colocId: ID!) {
+    colocThanks(colocId: $colocId) {
+      id
+      from_id
+      to_id
+      createdAt
+    }
+  }
+`
 
 export const THANK_USER = gql`
   mutation ThankUser($target_id: ID!) {

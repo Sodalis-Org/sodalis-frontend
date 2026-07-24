@@ -40,3 +40,15 @@ export const GET_NOTIFICATIONS = gql`
     }
   }
 `
+
+export const GET_UNREAD_NOTIFICATIONS_COUNT = gql`
+  query GetUnreadNotificationsCount($colocId: ID!) {
+    unreadNotificationsCount(colocId: $colocId)
+  }
+`
+
+export const MARK_NOTIFICATIONS_READ = gql`
+  mutation MarkNotificationsRead($colocId: ID!) {
+    markNotificationsRead(colocId: $colocId)
+  }
+`

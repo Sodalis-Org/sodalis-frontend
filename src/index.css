@@ -1,3 +1,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Palette Sodalis — valeurs calibrées à partir de la charte fournie
+ * (background / foreground / primary / secondary / muted / accent / card / border).
+ * `primary` et `secondary` sont légèrement plus foncés que la charte de couleurs
+ * d'origine : la teinte affichée seule ne passait pas le contraste AA (4.5:1) avec
+ * un texte blanc dessus (boutons pleins, pastilles actives) — assombri à teinte
+ * égale plutôt que changé de famille. `accent` reste tel quel mais s'utilise avec
+ * un texte foncé (accent-foreground), jamais blanc, pour la même raison.
+ */
+:root {
+  --background: 251 246 238;
+  --foreground: 20 20 28;
+
+  --card: 255 255 255;
+  --card-foreground: 20 20 28;
+
+  --primary: 166 98 73;
+  --primary-foreground: 255 255 255;
+
+  --secondary: 100 123 88;
+  --secondary-foreground: 255 255 255;
+
+  --muted: 241 236 226;
+  --muted-foreground: 100 106 118;
+
+  --accent: 221 177 97;
+  --accent-foreground: 61 43 15;
+
+  --border: 228 223 211;
+  --input: 255 255 255;
+  --ring: 166 98 73;
+
+  --destructive: 220 38 38;
+  --destructive-foreground: 255 255 255;
+}

@@ -7,7 +7,6 @@ export const GET_USERS_BY_COLOC = gql`
       name
       email
       role
-      coloc_id
       harmony_score
       karma_score
     }

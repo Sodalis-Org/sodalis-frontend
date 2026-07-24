@@ -6,46 +6,8 @@ import { useSocket } from '../context/SocketContext'
 import { useAuthContext } from '../context/AuthContext'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 import { GET_NOTIFICATIONS } from '../graphql/dashboard'
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const NOTIF_ICONS = {
-  NEW_TASK:                    '📋',
-  TASK_UPDATED:                '🔄',
-  TASK_COMPLETED_SCORE_UPDATE: '⭐',
-  NEW_MAINTENANCE_TICKET:      '🔧',
-  MAINTENANCE_TICKET_UPDATED:  '🔧',
-  MAINTENANCE_TICKET_ASSIGNED: '👤',
-  NEW_COMPLAINT:               '⚠️',
-  COMPLAINT_TARGETED:          '🎯',
-  COMPLAINT_RESOLVED:          '✅',
-  COMPLAINT_DELETED:           '🗑️',
-  NEW_POLL:                    '🗳️',
-  POLL_UPDATED:                '🗳️',
-}
-
-const NOTIF_COLORS = {
-  NEW_TASK:                    'border-l-blue-400',
-  TASK_COMPLETED_SCORE_UPDATE: 'border-l-green-400',
-  NEW_MAINTENANCE_TICKET:      'border-l-orange-400',
-  MAINTENANCE_TICKET_UPDATED:  'border-l-orange-300',
-  NEW_COMPLAINT:               'border-l-red-400',
-  COMPLAINT_TARGETED:          'border-l-red-500',
-  COMPLAINT_RESOLVED:          'border-l-green-400',
-  NEW_POLL:                    'border-l-indigo-400',
-  POLL_UPDATED:                'border-l-indigo-300',
-}
-
-function timeAgo(isoDate) {
-  if (!isoDate) return ''
-  const diff = Date.now() - new Date(isoDate).getTime()
-  const m = Math.floor(diff / 60000)
-  if (m < 1) return "à l'instant"
-  if (m < 60) return `il y a ${m} min`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `il y a ${h} h`
-  return `il y a ${Math.floor(h / 24)} j`
-}
+import { NOTIF_ICONS, NOTIF_COLORS } from '../lib/notifications'
+import { timeAgo } from '../lib/time'
 
 // ─── Bell button ──────────────────────────────────────────────────────────────
 
@@ -55,11 +17,11 @@ export function NotificationBell({ onClick }) {
     <button
       onClick={onClick}
       aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}` : 'Notifications'}
-      className="relative w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition shadow-sm"
+      className="relative w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition shadow-sm"
     >
       <Bell size={17} aria-hidden="true" />
       {unreadCount > 0 && (
-        <span aria-hidden="true" className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
+        <span aria-hidden="true" className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center leading-none">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
@@ -110,26 +72,27 @@ export function NotificationDrawer({ open, onClose }) {
       <button
         type="button"
         aria-label="Fermer"
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm cursor-default"
+        className="fixed inset-0 z-[55] bg-black/30 backdrop-blur-sm cursor-default"
         onClick={onClose}
       />
 
-      {/* Panel */}
+      {/* Panel — au-dessus de la nav du bas (z-50) pour ne jamais lui laisser
+          masquer le bas de la liste ou le pied de page. */}
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm bg-white shadow-2xl flex flex-col"
+        className="fixed top-0 right-0 bottom-0 z-[60] w-full max-w-sm bg-background shadow-2xl flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-12 pb-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 pb-4 border-b border-border" style={{ paddingTop: 'calc(3rem + env(safe-area-inset-top))' }}>
           <div className="flex items-center gap-2">
-            <Bell size={18} aria-hidden="true" className="text-indigo-600" />
-            <h2 id={titleId} className="text-base font-bold text-gray-900">Notifications</h2>
+            <Bell size={18} aria-hidden="true" className="text-primary" />
+            <h2 id={titleId} className="text-base font-bold text-foreground">Notifications</h2>
             {unreadCount === 0 && liveNotifs.length > 0 && (
-              <span className="text-xs text-gray-600">(tout lu)</span>
+              <span className="text-xs text-muted-foreground">(tout lu)</span>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -137,14 +100,14 @@ export function NotificationDrawer({ open, onClose }) {
             <button
               onClick={() => { setPage(1); refetch() }}
               aria-label="Rafraîchir les notifications"
-              className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
+              className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition"
             >
               <RefreshCw size={14} aria-hidden="true" />
             </button>
             <button
               onClick={onClose}
               aria-label="Fermer les notifications"
-              className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
+              className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition"
             >
               <X size={16} aria-hidden="true" />
             </button>
@@ -155,17 +118,17 @@ export function NotificationDrawer({ open, onClose }) {
         <div className="flex-1 overflow-y-auto">
           {merged.length === 0 && !loading ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
-              <Bell size={36} aria-hidden="true" className="text-gray-200" />
-              <p className="text-sm text-gray-600">Aucune notification pour le moment.</p>
-              <p className="text-xs text-gray-300">Les événements de la colocation apparaîtront ici en temps réel.</p>
+              <Bell size={36} aria-hidden="true" className="text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">Aucune notification pour le moment.</p>
+              <p className="text-xs text-muted-foreground/70">Les événements de la colocation apparaîtront ici en temps réel.</p>
             </div>
           ) : (
-            <div className="flex flex-col divide-y divide-gray-50">
+            <div className="flex flex-col gap-2 p-4">
               {/* Live section label */}
               {liveNotifs.length > 0 && (
-                <div className="px-4 py-2 bg-indigo-50 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                  <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">
+                <div className="px-3.5 py-2 rounded-xl bg-primary/10 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-xs font-semibold text-primary uppercase tracking-wide">
                     Temps réel · {liveNotifs.length} nouveau{liveNotifs.length > 1 ? 'x' : ''}
                   </span>
                 </div>
@@ -177,25 +140,25 @@ export function NotificationDrawer({ open, onClose }) {
                   <div
                     key={notif.id ?? notif._id ?? i}
                     className={clsx(
-                      'flex items-start gap-3 px-4 py-3.5 border-l-[3px] transition',
-                      NOTIF_COLORS[notif.type] ?? 'border-l-gray-200',
-                      isLive ? 'bg-indigo-50/30' : 'bg-white'
+                      'flex items-start gap-3 rounded-2xl border-l-[3px] bg-card shadow-sm p-3.5 transition',
+                      NOTIF_COLORS[notif.type] ?? 'border-l-border',
+                      isLive && 'ring-1 ring-primary/20'
                     )}
                   >
                     <span aria-hidden="true" className="text-xl leading-none mt-0.5 shrink-0">
                       {NOTIF_ICONS[notif.type] ?? '📣'}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-800 leading-snug">{notif.message}</p>
+                      <p className="text-sm text-foreground leading-snug">{notif.message}</p>
                       <div className="flex items-center gap-2 mt-1">
                         {notif.type && (
-                          <span className="text-xs text-gray-600 font-mono">{notif.type}</span>
+                          <span className="text-xs text-muted-foreground font-mono">{notif.type}</span>
                         )}
-                        <span className="text-xs text-gray-600">
+                        <span className="text-xs text-muted-foreground">
                           {timeAgo(notif.created_at ?? notif.createdAt)}
                         </span>
                         {isLive && (
-                          <span className="text-xs text-indigo-500 font-medium">Live</span>
+                          <span className="text-xs text-primary font-medium">Live</span>
                         )}
                       </div>
                     </div>
@@ -205,22 +168,20 @@ export function NotificationDrawer({ open, onClose }) {
 
               {/* Pagination */}
               {hasMore && (
-                <div className="p-4">
-                  <button
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={loading}
-                    className="w-full py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-600 font-medium hover:bg-gray-100 transition disabled:opacity-50"
-                  >
-                    {loading ? 'Chargement…' : 'Charger plus'}
-                  </button>
-                </div>
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={loading}
+                  className="w-full py-2.5 rounded-xl bg-muted border border-border text-sm text-muted-foreground font-medium hover:bg-muted/70 transition disabled:opacity-50"
+                >
+                  {loading ? 'Chargement…' : 'Charger plus'}
+                </button>
               )}
 
               {loading && merged.length === 0 && (
-                <div role="status" aria-live="polite" className="flex flex-col gap-3 p-4">
+                <div role="status" aria-live="polite" className="flex flex-col gap-2">
                   <span className="sr-only">Chargement en cours</span>
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} aria-hidden="true" className="h-14 rounded-xl bg-gray-100 animate-pulse" />
+                    <div key={i} aria-hidden="true" className="h-14 rounded-2xl bg-muted animate-pulse" />
                   ))}
                 </div>
               )}
@@ -230,8 +191,8 @@ export function NotificationDrawer({ open, onClose }) {
 
         {/* Footer — total */}
         {pagination && (
-          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-            <p className="text-xs text-gray-600 text-center">
+          <div className="px-4 pt-3 border-t border-border bg-muted" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
+            <p className="text-xs text-muted-foreground text-center">
               {pagination.total} notification{pagination.total > 1 ? 's' : ''} au total · page {page}/{Math.ceil(pagination.total / pagination.limit)}
             </p>
           </div>
@@ -259,7 +220,7 @@ function SocketStatus() {
 
   return (
     <div className={clsx('flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium',
-      connected ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-600'
+      connected ? 'bg-secondary/10 text-secondary' : 'bg-muted text-muted-foreground'
     )}>
       {connected ? <Wifi size={11} aria-hidden="true" /> : <WifiOff size={11} aria-hidden="true" />}
       {connected ? 'Live' : 'Hors ligne'}

@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { GET_COLOC_DASHBOARD, GET_NOTIFICATIONS } from '../../src/graphql/dashboard'
 import { GET_MAINTENANCE_TICKETS } from '../../src/graphql/maintenance'
+import { UPDATE_TASK_STATUS } from '../../src/graphql/tasks'
 import { useDashboard } from '../../src/hooks/useDashboard'
 import { setAuthUser, resetAuthUser, makeWrapper } from '../utils.jsx'
 
@@ -16,7 +17,7 @@ const dashboard = {
   open_complaints: 2,
 }
 
-function baseMocks() {
+function baseMocks({ tickets } = {}) {
   return [
     {
       request: { query: GET_COLOC_DASHBOARD, variables: { colocId } },
@@ -30,10 +31,10 @@ function baseMocks() {
       request: { query: GET_MAINTENANCE_TICKETS, variables: { colocId } },
       result: {
         data: {
-          maintenanceTickets: [
-            { id: 1, priority: 'URGENT', status: 'OPEN' },
-            { id: 2, priority: 'LOW', status: 'OPEN' },
-            { id: 3, priority: 'HIGH', status: 'RESOLVED' },
+          maintenanceTickets: tickets ?? [
+            { id: 1, priority: 'URGENT', status: 'OPEN', created_by: 'u2', created_at: '2026-07-20T00:00:00Z' },
+            { id: 2, priority: 'LOW', status: 'OPEN', created_by: 'u2', created_at: '2026-07-21T00:00:00Z' },
+            { id: 3, priority: 'HIGH', status: 'RESOLVED', created_by: 'u2', created_at: '2026-07-22T00:00:00Z' },
           ],
         },
       },
@@ -63,6 +64,51 @@ describe('useDashboard', () => {
 
     expect(result.current.notifications).toHaveLength(1)
     expect(result.current.notifications[0]).toMatchObject({ id: 'n1', message: 'Bienvenue' })
+
+    expect(result.current.primaryAlert.id).toBe(1)
+    expect(result.current.secondaryAlertCount).toBe(0)
+    expect(result.current.isSelfAssignedAlert).toBe(false)
+
+    unmount()
+  })
+
+  it('flags the primary alert as self-assigned when the current user created the urgent ticket', async () => {
+    const tickets = [
+      { id: 5, priority: 'URGENT', status: 'OPEN', created_by: 'u1', created_at: '2026-07-20T00:00:00Z' },
+      { id: 6, priority: 'HIGH', status: 'OPEN', created_by: 'u2', created_at: '2026-07-21T00:00:00Z' },
+    ]
+    const { result, unmount } = renderHook(() => useDashboard(), { wrapper: makeWrapper(baseMocks({ tickets })) })
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.primaryAlert.id).toBe(5)
+    expect(result.current.secondaryAlertCount).toBe(1)
+    expect(result.current.isSelfAssignedAlert).toBe(true)
+
+    unmount()
+  })
+
+  it('completes a task via updateTaskStatus and clears completingTaskId afterwards', async () => {
+    const mocks = [
+      ...baseMocks(),
+      {
+        request: { query: UPDATE_TASK_STATUS, variables: { id: 't1', status: 'DONE' } },
+        result: { data: { updateTaskStatus: { id: 't1', status: 'DONE' } } },
+      },
+      {
+        request: { query: GET_COLOC_DASHBOARD, variables: { colocId } },
+        result: { data: { getColocDashboard: dashboard } },
+      },
+    ]
+    const { result, unmount } = renderHook(() => useDashboard(), { wrapper: makeWrapper(mocks) })
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.completeTask('t1')
+    })
+
+    expect(result.current.completingTaskId).toBe(null)
 
     unmount()
   })
