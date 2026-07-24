@@ -7,7 +7,22 @@ const httpLink = new HttpLink({
 
 const client = new ApolloClient({
   link: httpLink,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      User: {
+        fields: {
+          // Évite qu'une query User incomplète (ex. usersByColoc sans coloc_id
+          // côté API) écrase me.coloc_id avec null et déclenche PrivateRoute.
+          coloc_id: {
+            merge(existing, incoming) {
+              if (incoming == null && existing != null) return existing
+              return incoming
+            },
+          },
+        },
+      },
+    },
+  }),
 })
 
 export default client

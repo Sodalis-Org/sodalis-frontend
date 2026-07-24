@@ -11,16 +11,17 @@ import { GET_MY_COLOC } from '../../src/graphql/auth'
 import { GET_TASKS_BY_COLOC } from '../../src/graphql/tasks'
 import Dashboard from '../../src/pages/Dashboard'
 import Onboarding from '../../src/pages/Onboarding'
-import Domus from '../../src/pages/Domus'
-import Labor from '../../src/pages/Labor'
+import Profile from '../../src/pages/Profile'
+import Chores from '../../src/pages/Chores'
 import { NotificationDrawer } from '../../src/components/NotificationDrawer'
 import { formatViolations } from './report'
 
 expect.extend(matchers)
 
 // Échantillon retenu pour l'audit RGAA (tâches 5.1/5.4) : accueil (Dashboard),
-// authentification (Onboarding en mode connexion), création de ticket (Domus,
-// modale ouverte), liste des tâches (Labor), notifications (NotificationDrawer).
+// authentification (Onboarding en mode connexion), profil + membres du logement
+// (Profile), corvées & maintenance avec modale de création ouverte (Chores),
+// notifications (NotificationDrawer).
 // jsdom ne fait aucun rendu visuel : la règle axe-core "color-contrast" ne peut
 // pas conclure ici (toujours "incomplete", jamais violation exploitable) — le
 // contraste est vérifié séparément par scripts/check-contrast.mjs.
@@ -63,21 +64,11 @@ function dashboardMocks() {
   ]
 }
 
-function domusMocks() {
+function profileMocks() {
   return [
     {
       request: { query: GET_USERS_BY_COLOC, variables: { colocId } },
       result: { data: { usersByColoc: [{ id: 'u1', name: 'Alice' }, { id: 'u2', name: 'Bob' }] } },
-    },
-    {
-      request: { query: GET_MAINTENANCE_TICKETS, variables: { colocId } },
-      result: {
-        data: {
-          maintenanceTickets: [
-            { id: 1, title: 'Fuite', status: 'OPEN', priority: 'HIGH', category: 'PLUMBING' },
-          ],
-        },
-      },
     },
     {
       request: { query: GET_MY_COLOC },
@@ -86,7 +77,7 @@ function domusMocks() {
   ]
 }
 
-function laborMocks() {
+function choresMocks() {
   return [
     {
       request: { query: GET_TASKS_BY_COLOC, variables: { colocId } },
@@ -95,6 +86,16 @@ function laborMocks() {
           tasksByColoc: [
             { id: 't1', title: 'Vaisselle', status: 'TODO', assignee_id: 'u1', due_at: null },
             { id: 't2', title: 'Poubelles', status: 'IN_PROGRESS', assignee_id: 'u1', due_at: '2999-01-01' },
+          ],
+        },
+      },
+    },
+    {
+      request: { query: GET_MAINTENANCE_TICKETS, variables: { colocId } },
+      result: {
+        data: {
+          maintenanceTickets: [
+            { id: 1, title: 'Fuite', status: 'OPEN', priority: 'URGENT', category: 'PLUMBING', assigned_to: 'u1' },
           ],
         },
       },
@@ -130,8 +131,8 @@ describe('audit RGAA — échantillon de pages', () => {
 
   it.each([
     ['Dashboard', () => <AllProviders mocks={dashboardMocks()}><Dashboard /></AllProviders>],
-    ['Domus', () => <AllProviders mocks={domusMocks()}><Domus /></AllProviders>],
-    ['Labor', () => <AllProviders mocks={laborMocks()}><Labor /></AllProviders>],
+    ['Profile', () => <AllProviders mocks={profileMocks()}><Profile /></AllProviders>],
+    ['Chores', () => <AllProviders mocks={choresMocks()}><Chores /></AllProviders>],
   ])('%s ne provoque pas de crash et produit un rapport axe', async (label, renderPage) => {
     const { container } = render(renderPage())
     await screen.findByRole('heading', { level: 1 })
@@ -152,15 +153,14 @@ describe('audit RGAA — échantillon de pages', () => {
     expect(Array.isArray(results.violations)).toBe(true)
   })
 
-  it('Domus — modale de création de ticket produit un rapport axe', async () => {
+  it('Chores — modale de création (corvée / ticket) produit un rapport axe', async () => {
     const user = userEvent.setup()
-    const { container } = render(<AllProviders mocks={domusMocks()}><Domus /></AllProviders>)
+    const { container } = render(<AllProviders mocks={choresMocks()}><Chores /></AllProviders>)
     await screen.findByRole('heading', { level: 1 })
-    await user.click(screen.getByRole('button', { name: /maintenance/i }))
-    await user.click(screen.getByRole('button', { name: /signaler/i }))
-    await screen.findByRole('heading', { name: /nouveau ticket/i })
+    await user.click(screen.getByRole('button', { name: /ajouter une corvée ou un ticket/i }))
+    await screen.findByRole('heading', { name: /nouvel élément/i })
     const results = await axe(container)
-    console.table(formatViolations('Domus (modale création ticket)', results.violations))
+    console.table(formatViolations('Chores (modale création)', results.violations))
     expect(Array.isArray(results.violations)).toBe(true)
   })
 
