@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import {
-  Users, Wrench, Plus, X, Star, Heart, ShieldCheck, User,
+  Users, Wrench, Plus, Star, Heart, ShieldCheck, User,
   Droplets, Zap, AirVent, Sofa, Wifi, HelpCircle,
-  ChevronDown, AlertTriangle, Loader2, UserCheck, Copy, Check,
+  ChevronDown, AlertTriangle, UserCheck, Copy, Check,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useDomus } from '../../hooks/useDomus'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
+import Modal from '../../components/Modal'
+import SelectField from '../../components/SelectField'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -30,7 +34,7 @@ const TICKET_STATUSES = [
   { value: 'OPEN',        label: 'Ouvert',   color: 'bg-gray-100 text-gray-600'   },
   { value: 'IN_PROGRESS', label: 'En cours', color: 'bg-blue-100 text-blue-700'   },
   { value: 'RESOLVED',    label: 'Résolu',   color: 'bg-green-100 text-green-700' },
-  { value: 'CANCELLED',   label: 'Annulé',   color: 'bg-red-50 text-red-400'      },
+  { value: 'CANCELLED',   label: 'Annulé',   color: 'bg-red-50 text-red-700'      },
 ]
 
 const STATUS_TRANSITIONS = {
@@ -55,38 +59,18 @@ function TabBar({ tabs, active, onChange }) {
           onClick={() => onChange(tab.value)}
           className={clsx(
             'flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium transition-all',
-            active === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            active === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'
           )}
         >
-          <tab.Icon size={15} />
+          <tab.Icon size={15} aria-hidden="true" />
           {tab.label}
           {tab.count > 0 && (
             <span className={clsx('text-xs rounded-full px-1.5 py-0.5 font-semibold',
-              active === tab.value ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'
+              active === tab.value ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-600'
             )}>{tab.count}</span>
           )}
         </button>
       ))}
-    </div>
-  )
-}
-
-function SelectField({ label, value, onChange, options }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition pr-8"
-        >
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-      </div>
     </div>
   )
 }
@@ -106,81 +90,72 @@ function CreateTicketModal({ onClose, onCreate, loading, error }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-900">Nouveau ticket</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
-            <X size={16} />
-          </button>
+    <Modal title="Nouveau ticket" onClose={onClose}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="ticket-title" className="text-sm font-medium text-gray-700">Titre</label>
+          <input
+            id="ticket-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            maxLength={200}
+            placeholder="Ex: Robinet qui fuit sous l'évier"
+            className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="ticket-title" className="text-sm font-medium text-gray-700">Titre</label>
-            <input
-              id="ticket-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              maxLength={200}
-              placeholder="Ex: Robinet qui fuit sous l'évier"
-              className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="ticket-description" className="text-sm font-medium text-gray-700">
+            Description <span className="text-gray-600 font-normal">(optionnel)</span>
+          </label>
+          <textarea
+            id="ticket-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Détails supplémentaires..."
+            rows={3}
+            className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <SelectField
+            label="Catégorie"
+            value={category}
+            onChange={setCategory}
+            options={CATEGORIES.map((c) => ({ value: c.value, label: c.label }))}
+          />
+          <SelectField
+            label="Priorité"
+            value={priority}
+            onChange={setPriority}
+            options={PRIORITIES.map((p) => ({ value: p.value, label: p.label }))}
+          />
+        </div>
+
+        {priority === 'URGENT' && (
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs">
+            <AlertTriangle size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
+            <span>Priorité URGENT — une tâche sera automatiquement créée dans Labor.</span>
           </div>
+        )}
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="ticket-description" className="text-sm font-medium text-gray-700">
-              Description <span className="text-gray-400 font-normal">(optionnel)</span>
-            </label>
-            <textarea
-              id="ticket-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Détails supplémentaires..."
-              rows={3}
-              className="px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          </div>
+        {error && (
+          <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
+            <AlertTriangle size={13} aria-hidden="true" /> {error}
+          </p>
+        )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <SelectField
-              label="Catégorie"
-              value={category}
-              onChange={setCategory}
-              options={CATEGORIES.map((c) => ({ value: c.value, label: c.label }))}
-            />
-            <SelectField
-              label="Priorité"
-              value={priority}
-              onChange={setPriority}
-              options={PRIORITIES.map((p) => ({ value: p.value, label: p.label }))}
-            />
-          </div>
-
-          {priority === 'URGENT' && (
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs">
-              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-              <span>Priorité URGENT — une tâche sera automatiquement créée dans Labor.</span>
-            </div>
-          )}
-
-          {error && (
-            <p className="text-xs text-red-600 flex items-center gap-1.5">
-              <AlertTriangle size={13} /> {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
-          >
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /> Créer le ticket</>}
-          </button>
-        </form>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
+        >
+          {loading ? <LoadingSpinner size={16} /> : <><Plus size={16} aria-hidden="true" /> Créer le ticket</>}
+        </button>
+      </form>
+    </Modal>
   )
 }
 
@@ -202,7 +177,7 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
     <div className={clsx('bg-white rounded-2xl border p-4 flex flex-col gap-3 transition', isDone ? 'border-gray-100 opacity-60' : 'border-gray-200')}>
       <div className="flex items-start gap-3">
         <div className={clsx('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', priority?.color ?? 'bg-gray-100 text-gray-500')}>
-          <CatIcon size={17} />
+          <CatIcon size={17} aria-hidden="true" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-900 leading-snug">{ticket.title}</p>
@@ -213,14 +188,14 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Badge label={priority?.label ?? ticket.priority} color={priority?.color ?? 'bg-gray-100 text-gray-500'} />
-        <Badge label={status?.label ?? ticket.status}     color={status?.color   ?? 'bg-gray-100 text-gray-500'} />
+        <Badge label={priority?.label ?? ticket.priority} color={priority?.color ?? 'bg-gray-100 text-gray-600'} />
+        <Badge label={status?.label ?? ticket.status}     color={status?.color   ?? 'bg-gray-100 text-gray-600'} />
         <Badge label={cat?.label    ?? ticket.category}   color="bg-gray-100 text-gray-600" />
       </div>
 
       {assignee && (
         <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <UserCheck size={13} />
+          <UserCheck size={13} aria-hidden="true" />
           <span>Assigné à <span className="font-medium text-gray-700">{assignee.name}</span></span>
         </div>
       )}
@@ -234,7 +209,7 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
                 className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-100 transition"
               >
                 <span>Changer statut</span>
-                <ChevronDown size={13} />
+                <ChevronDown size={13} aria-hidden="true" />
               </button>
               {statusOpen && (
                 <div className="absolute bottom-full mb-1 left-0 right-0 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden z-20">
@@ -262,7 +237,7 @@ function TicketCard({ ticket, members, isAdmin, onUpdateStatus, onAssign }) {
                 className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-100 transition"
               >
                 <span>{assignee ? 'Réassigner' : 'Assigner'}</span>
-                <ChevronDown size={13} />
+                <ChevronDown size={13} aria-hidden="true" />
               </button>
               {assignOpen && (
                 <div className="absolute bottom-full mb-1 left-0 right-0 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden z-20">
@@ -302,23 +277,23 @@ function MembersTab({ members, currentUserId }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
-              {member.id === currentUserId && <span className="text-xs text-gray-400">(moi)</span>}
+              {member.id === currentUserId && <span className="text-xs text-gray-600">(moi)</span>}
             </div>
-            <p className="text-xs text-gray-400 truncate mt-0.5">{member.email}</p>
+            <p className="text-xs text-gray-600 truncate mt-0.5">{member.email}</p>
           </div>
           <div className="flex flex-col items-end gap-1.5 shrink-0">
             {member.role === 'ADMIN' ? (
               <span className="flex items-center gap-1 text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-lg font-medium">
-                <ShieldCheck size={11} /> Admin
+                <ShieldCheck size={11} aria-hidden="true" /> Admin
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-lg font-medium">
-                <User size={11} /> Membre
+              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium">
+                <User size={11} aria-hidden="true" /> Membre
               </span>
             )}
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="flex items-center gap-1"><Star size={10} className="text-indigo-400" />{member.harmony_score}</span>
-              <span className="flex items-center gap-1"><Heart size={10} className="text-purple-400" />{member.karma_score}</span>
+              <span className="flex items-center gap-1"><Star size={10} aria-hidden="true" className="text-indigo-400" />{member.harmony_score}</span>
+              <span className="flex items-center gap-1"><Heart size={10} aria-hidden="true" className="text-purple-400" />{member.karma_score}</span>
             </div>
           </div>
         </div>
@@ -359,8 +334,8 @@ function MaintenanceTab({ tickets, members, isAdmin, onUpdateStatus, onAssign })
 
       {filtered.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-          <Wrench size={28} className="mx-auto text-gray-300 mb-2" />
-          <p className="text-sm text-gray-400">
+          <Wrench size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
+          <p className="text-sm text-gray-600">
             Aucun ticket {filter === 'active' ? 'actif' : filter === 'done' ? 'terminé' : ''}
           </p>
         </div>
@@ -383,6 +358,7 @@ function MaintenanceTab({ tickets, members, isAdmin, onUpdateStatus, onAssign })
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Domus() {
+  useDocumentTitle('Domus')
   const [activeTab, setActiveTab]       = useState('members')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [inviteCopied, setInviteCopied] = useState(false)
@@ -422,8 +398,9 @@ export default function Domus() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 px-4 pt-4">
-        {[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
+      <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
+        <span className="sr-only">Chargement en cours</span>
+        {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
   }
@@ -444,14 +421,14 @@ export default function Domus() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-xl font-bold text-gray-900">Domus</h1>
-              <p className="text-xs text-gray-400 mt-0.5">Habitat &amp; maintenance</p>
+              <p className="text-xs text-gray-600 mt-0.5">Habitat &amp; maintenance</p>
             </div>
             {activeTab === 'maintenance' && (
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
               >
-                <Plus size={16} /> Signaler
+                <Plus size={16} aria-hidden="true" /> Signaler
               </button>
             )}
           </div>
@@ -464,7 +441,7 @@ export default function Domus() {
                   onClick={copyInviteCode}
                   className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-indigo-100 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition"
                 >
-                  {inviteCopied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                  {inviteCopied ? <Check size={14} aria-hidden="true" className="text-green-600" /> : <Copy size={14} aria-hidden="true" />}
                   {inviteCopied ? 'Copié !' : 'Copier'}
                 </button>
               </div>

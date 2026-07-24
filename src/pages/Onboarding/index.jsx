@@ -1,48 +1,20 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { Home, LogIn, UserPlus, Key, Plus, AlertCircle, Loader2, Eye, EyeOff, Copy, Check } from 'lucide-react'
+import { Home, LogIn, UserPlus, Key, Plus, AlertCircle, Copy, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useAuthContext } from '../../context/AuthContext'
 import { useAuth } from '../../hooks/useAuth'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
+import InputField from '../../components/InputField'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
-
-function InputField({ label, type = 'text', value, onChange, placeholder, autoComplete, required }) {
-  const [show, setShow] = useState(false)
-  const isPassword = type === 'password'
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      <div className="relative">
-        <input
-          type={isPassword && show ? 'text' : type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          required={required}
-          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-        />
-        {isPassword && (
-          <button
-            type="button"
-            onClick={() => setShow((s) => !s)}
-            aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600"
-          >
-            {show ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
 
 function ErrorBanner({ message }) {
   if (!message) return null
   return (
-    <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
-      <AlertCircle size={16} className="mt-0.5 shrink-0" />
+    <div role="alert" className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
+      <AlertCircle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
       <span>{message}</span>
     </div>
   )
@@ -56,7 +28,7 @@ function PrimaryButton({ children, loading, disabled, type = 'submit', onClick }
       disabled={loading || disabled}
       className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
     >
-      {loading ? <Loader2 size={16} className="animate-spin" /> : children}
+      {loading ? <LoadingSpinner size={16} /> : children}
     </button>
   )
 }
@@ -112,8 +84,8 @@ function AuthStep() {
         value={mode}
         onChange={(v) => { setMode(v); setError(null) }}
         options={[
-          { value: 'login',    label: 'Se connecter', icon: <LogIn size={14} /> },
-          { value: 'register', label: "S'inscrire",   icon: <UserPlus size={14} /> },
+          { value: 'login',    label: 'Se connecter', icon: <LogIn size={14} aria-hidden="true" /> },
+          { value: 'register', label: "S'inscrire",   icon: <UserPlus size={14} aria-hidden="true" /> },
         ]}
       />
 
@@ -221,7 +193,7 @@ function ColocStep() {
             onClick={copyInvite}
             className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
           >
-            {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+            {copied ? <Check size={14} aria-hidden="true" className="text-green-600" /> : <Copy size={14} aria-hidden="true" />}
             {copied ? 'Copié' : 'Copier'}
           </button>
         </div>
@@ -231,7 +203,7 @@ function ColocStep() {
         <button
           type="button"
           onClick={logout}
-          className="text-center text-xs text-gray-400 hover:text-gray-600 transition mt-1"
+          className="text-center text-xs text-gray-600 hover:text-gray-700 transition mt-1"
         >
           Se déconnecter
         </button>
@@ -249,8 +221,8 @@ function ColocStep() {
           setCreatedColoc(null)
         }}
         options={[
-          { value: 'create', label: 'Créer une coloc', icon: <Plus size={14} /> },
-          { value: 'join',   label: 'Rejoindre',        icon: <Key size={14} /> },
+          { value: 'create', label: 'Créer une coloc', icon: <Plus size={14} aria-hidden="true" /> },
+          { value: 'join',   label: 'Rejoindre',        icon: <Key size={14} aria-hidden="true" /> },
         ]}
       />
 
@@ -282,7 +254,7 @@ function ColocStep() {
       <button
         type="button"
         onClick={logout}
-        className="text-center text-xs text-gray-400 hover:text-gray-600 transition mt-1"
+        className="text-center text-xs text-gray-600 hover:text-gray-700 transition mt-1"
       >
         Se déconnecter
       </button>
@@ -293,19 +265,27 @@ function ColocStep() {
 // ─── Page shell ───────────────────────────────────────────────────────────────
 
 export default function Onboarding({ colocStep = false }) {
-  const { user, token } = useAuthContext()
+  useDocumentTitle(colocStep ? 'Configurer ma colocation' : 'Connexion')
+  const { user, loading } = useAuthContext()
 
-  if (token && user?.coloc_id) return <Navigate to="/" replace />
-  if (colocStep && !token) return <Navigate to="/onboarding" replace />
-  if (!colocStep && token && !user?.coloc_id) return <Navigate to="/onboarding/coloc" replace />
+  if (loading) return null
+  if (user && user.coloc_id) return <Navigate to="/" replace />
+  if (colocStep && !user) return <Navigate to="/onboarding" replace />
+  if (!colocStep && user && !user.coloc_id) return <Navigate to="/onboarding/coloc" replace />
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col items-center justify-center px-5 py-12">
-      <div className="w-full max-w-sm">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-xl"
+      >
+        Aller au contenu principal
+      </a>
+      <main id="main-content" tabIndex={-1} className="w-full max-w-sm">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8 gap-3">
           <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg">
-            <Home size={28} className="text-white" strokeWidth={2} />
+            <Home size={28} aria-hidden="true" className="text-white" strokeWidth={2} />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Sodalis</h1>
@@ -337,7 +317,7 @@ export default function Onboarding({ colocStep = false }) {
           <div className={clsx('h-1.5 rounded-full transition-all', colocStep ? 'w-3 bg-indigo-300' : 'w-6 bg-indigo-600')} />
           <div className={clsx('h-1.5 rounded-full transition-all', colocStep ? 'w-6 bg-indigo-600' : 'w-3 bg-indigo-200')} />
         </div>
-      </div>
+      </main>
     </div>
   )
 }

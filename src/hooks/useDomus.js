@@ -11,7 +11,7 @@ import {
 import { GET_MY_COLOC } from '../graphql/auth'
 
 export function useDomus() {
-  const { user } = useAuthContext()
+  const { user, loading: authLoading } = useAuthContext()
   const colocId = user?.coloc_id
   const isAdmin = user?.role === 'ADMIN'
 
@@ -81,7 +81,7 @@ export function useDomus() {
   }
 
   return {
-    loading: usersLoading || ticketsLoading || myColocLoading,
+    loading: authLoading || usersLoading || ticketsLoading || myColocLoading,
     createLoading,
     formError,
     setFormError,

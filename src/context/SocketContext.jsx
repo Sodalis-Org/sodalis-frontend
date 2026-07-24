@@ -15,11 +15,13 @@ export function SocketProvider({ children }) {
 
     const socket = io(
       import.meta.env.VITE_SOCKET_URL ?? 'http://localhost:3003',
-      { transports: ['websocket'] }
+      { transports: ['websocket'], withCredentials: true }
     )
     socketRef.current = socket
 
-    socket.on(`coloc_${user.coloc_id}_notifications`, (event) => {
+    // Le serveur décide seul de la room (basée sur le cookie vérifié au handshake) ;
+    // le nom d'événement n'a plus besoin d'encoder le coloc_id côté client.
+    socket.on('notification', (event) => {
       setNotifications((prev) => [{ ...event, _id: Date.now() }, ...prev].slice(0, 50))
       setUnreadCount((n) => n + 1)
     })

@@ -42,7 +42,9 @@ Le champ `overrides` du `package.json` force `tmp@^0.2.7` et `uuid@^11.1.1` : ce
 
 `lighthouserc.cjs` build l'application (`npm run build`), sert le résultat via `vite preview` sur le port 4173, puis lance Lighthouse 3 fois sur `/` et fait la moyenne. Le score minimum est vérifié par catégorie (`categories:performance`, `categories:accessibility`), pas sur le score global.
 
-Mesuré en local sur la page d'onboarding (`/`, non authentifié) : perf ≈ 0.99, a11y = 1.0.
+Mesuré en local sur la page d'onboarding (`/`, non authentifié), deux exécutions consécutives de 3 runs chacune : perf = 0.98 (6/6 runs), a11y = 1.0 (6/6 runs) — score reproductible et largement au-dessus du seuil.
+
+**Le job `lighthouse` de la CI (`ci.yml`) est bloquant** depuis la clôture du chantier 5 (accessibilité) : le `continue-on-error` qui le neutralisait tant que l'audit RGAA n'était pas terminé a été retiré. Détail de l'audit, méthodologie et limites : [ACCESSIBILITE.md](./ACCESSIBILITE.md).
 
 ## Hors périmètre de ce document
 

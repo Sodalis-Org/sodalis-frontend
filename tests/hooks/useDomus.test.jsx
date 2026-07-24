@@ -8,7 +8,7 @@ import {
 } from '../../src/graphql/maintenance'
 import { GET_MY_COLOC } from '../../src/graphql/auth'
 import { useDomus } from '../../src/hooks/useDomus'
-import { setAuthUser, makeWrapper } from '../utils.jsx'
+import { setAuthUser, resetAuthUser, makeWrapper } from '../utils.jsx'
 
 const colocId = 'c1'
 
@@ -31,7 +31,7 @@ function baseMocks() {
 
 describe('useDomus', () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetAuthUser()
     setAuthUser({ id: 'u1', coloc_id: colocId, role: 'ADMIN' })
   })
 

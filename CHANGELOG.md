@@ -16,10 +16,33 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et ce pr
 
 ## [Non publié]
 
+### Added
+
+- Composants partagés `InputField`, `SelectField`, `Modal`, `LoadingSpinner` dans `src/components/`
+  (auparavant dupliqués ou implémentés en ligne par page).
+- Hooks `useFocusTrap` et `useDocumentTitle` (`src/hooks/`).
+- Tests d'accessibilité `vitest-axe` (`tests/a11y/`) : audit chiffré des pages échantillon, gate
+  strict sur les composants partagés, régression de contraste (`src/lib/contrast.js`).
+- Script d'audit de contraste `scripts/check-contrast.mjs`.
+- Instrumentation `@axe-core/react` en développement (`src/main.jsx`, éliminée du build de
+  production).
+- `ACCESSIBILITE.md` : audit RGAA 4.1 avant/après, taux de conformité, dispositif de
+  non-régression, limites connues (chantier 5).
+
+### Fixed
+
+- Accessibilité (RGAA 4.1, chantier 5) : association label/champ via `useId()`, noms accessibles
+  sur les boutons icône-seule, sémantique de dialogue et piège de focus sur les modales et le
+  panneau de notifications, contrastes de texte et de badges relevés au-dessus du seuil WCAG AA,
+  titre de page distinct par route, lien d'évitement vers le contenu principal, annonce des états
+  de chargement aux technologies d'assistance, icônes décoratives masquées.
+
 ### Changed
 
 - Mise à jour de `CLAUDE.md` : les affirmations sur l'absence de runner de tests, sur Socket.io
   « non câblé » et sur l'auth link Apollo « à câbler » ne sont plus d'actualité.
+- Le job `lighthouse` de la CI (`ci.yml`) est désormais bloquant : score accessibilité mesuré à
+  1,0 et performance à 0,98, reproductibles sur deux séries de 3 runs (chantier 5 terminé).
 
 ## [1.0.0] - 2026-07-23
 

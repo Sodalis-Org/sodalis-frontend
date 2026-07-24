@@ -1,48 +1,18 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import {
   MessageSquare, BarChart2, Heart, Plus, X, Trash2,
-  CheckCircle, EyeOff, User, Target, Loader2,
-  AlertTriangle, ChevronDown, Sparkles, Lock
+  CheckCircle, EyeOff, User, Target,
+  AlertTriangle, Sparkles, Lock
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useConcordia } from '../../hooks/useConcordia'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import Avatar from '../../components/Avatar'
+import Modal from '../../components/Modal'
+import SelectField from '../../components/SelectField'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
-
-function Modal({ title, onClose, children }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-gray-900">{title}</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
-            <X size={16} />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  )
-}
-
-function SelectField({ label, value, onChange, options }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition pr-8"
-        >
-          {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-      </div>
-    </div>
-  )
-}
 
 function timeAgo(isoDate) {
   if (!isoDate) return ''
@@ -62,7 +32,7 @@ function KarmaToast({ feedback }) {
   return (
     <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
       <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-600 shadow-lg text-sm font-semibold text-white">
-        <Sparkles size={15} />
+        <Sparkles size={15} aria-hidden="true" />
         <span>+3 Karma pour {feedback.name} · total : {feedback.score}</span>
       </div>
     </div>
@@ -115,10 +85,10 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
             isAnonymous ? 'bg-gray-900 border-gray-900 text-white' : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
           )}
         >
-          <EyeOff size={16} className="shrink-0" />
+          <EyeOff size={16} aria-hidden="true" className="shrink-0" />
           <div className="flex flex-col items-start">
             <span>Plainte anonyme</span>
-            <span className={clsx('text-xs font-normal', isAnonymous ? 'text-gray-300' : 'text-gray-400')}>
+            <span className={clsx('text-xs font-normal', isAnonymous ? 'text-gray-300' : 'text-gray-600')}>
               {isAnonymous ? 'Votre identité sera masquée définitivement' : 'Votre nom sera visible'}
             </span>
           </div>
@@ -128,8 +98,8 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
         </button>
 
         {error && (
-          <p className="text-xs text-red-600 flex items-center gap-1.5">
-            <AlertTriangle size={13} /> {error}
+          <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
+            <AlertTriangle size={13} aria-hidden="true" /> {error}
           </p>
         )}
 
@@ -138,7 +108,7 @@ function CreateComplaintModal({ onClose, onCreate, loading, error, members, curr
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <><MessageSquare size={15} /> Déposer la plainte</>}
+          {loading ? <LoadingSpinner size={16} /> : <><MessageSquare size={15} aria-hidden="true" /> Déposer la plainte</>}
         </button>
       </form>
     </Modal>
@@ -158,7 +128,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
         <div className="flex items-center gap-2 flex-wrap">
           {complaint.is_anonymous ? (
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <EyeOff size={13} />
+              <EyeOff size={13} aria-hidden="true" />
               <span className="font-medium">Auteur anonyme</span>
             </div>
           ) : creator ? (
@@ -167,8 +137,8 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
               <span className="text-xs font-medium text-gray-700">{creator.name}</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 text-xs text-gray-400">
-              <User size={13} /> <span>Utilisateur supprimé</span>
+            <div className="flex items-center gap-1.5 text-xs text-gray-600">
+              <User size={13} aria-hidden="true" /> <span>Utilisateur supprimé</span>
             </div>
           )}
 
@@ -176,7 +146,7 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
             <>
               <span className="text-gray-300 text-xs">→</span>
               <div className="flex items-center gap-1.5">
-                <Target size={12} className="text-orange-400" />
+                <Target size={12} aria-hidden="true" className="text-orange-400" />
                 <span className="text-xs font-medium text-orange-600">{target.name}</span>
               </div>
             </>
@@ -195,29 +165,31 @@ function ComplaintCard({ complaint, members, currentUserId, isAdmin, onResolve, 
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-400">{timeAgo(complaint.createdAt)}</span>
+        <span className="text-xs text-gray-600">{timeAgo(complaint.createdAt)}</span>
         {canAct && !isResolved && (
           <div className="flex items-center gap-2">
             <button
               onClick={() => onResolve(complaint.id)}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-green-50 text-green-700 text-xs font-medium hover:bg-green-100 transition"
             >
-              <CheckCircle size={13} /> Résoudre
+              <CheckCircle size={13} aria-hidden="true" /> Résoudre
             </button>
             <button
               onClick={() => onDelete(complaint.id)}
+              aria-label="Supprimer la plainte"
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-medium hover:bg-red-100 transition"
             >
-              <Trash2 size={13} />
+              <Trash2 size={13} aria-hidden="true" />
             </button>
           </div>
         )}
         {canAct && isResolved && (
           <button
             onClick={() => onDelete(complaint.id)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-400 text-xs hover:bg-gray-100 transition"
+            aria-label="Supprimer la plainte"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-xs hover:bg-gray-100 transition"
           >
-            <Trash2 size={13} />
+            <Trash2 size={13} aria-hidden="true" />
           </button>
         )}
       </div>
@@ -265,14 +237,14 @@ function ComplaintsTab({ complaints, members, currentUserId, isAdmin, onResolve,
             onClick={() => setShowModal(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition"
           >
-            <Plus size={14} /> Déposer
+            <Plus size={14} aria-hidden="true" /> Déposer
           </button>
         </div>
 
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-            <MessageSquare size={28} className="mx-auto text-gray-300 mb-2" />
-            <p className="text-sm text-gray-400">Aucune plainte {filter === 'open' ? 'ouverte' : filter === 'resolved' ? 'résolue' : ''}</p>
+            <MessageSquare size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
+            <p className="text-sm text-gray-600">Aucune plainte {filter === 'open' ? 'ouverte' : filter === 'resolved' ? 'résolue' : ''}</p>
           </div>
         ) : (
           filtered.map((c) => (
@@ -295,6 +267,7 @@ function ComplaintsTab({ complaints, members, currentUserId, isAdmin, onResolve,
 // ─── POLLS ────────────────────────────────────────────────────────────────────
 
 function CreatePollModal({ onClose, onCreate, loading, error }) {
+  const optionLabelId = useId()
   const [question, setQuestion] = useState('')
   const [options, setOptions]   = useState(['', ''])
 
@@ -324,10 +297,12 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-gray-700">Options <span className="text-gray-400 font-normal">(2–6)</span></span>
+          <span className="text-sm font-medium text-gray-700">Options <span className="text-gray-600 font-normal">(2–6)</span></span>
           {options.map((opt, i) => (
             <div key={i} className="flex gap-2">
+              <label htmlFor={`${optionLabelId}-${i}`} className="sr-only">{`Option ${i + 1}`}</label>
               <input
+                id={`${optionLabelId}-${i}`}
                 value={opt}
                 onChange={(e) => updateOption(i, e.target.value)}
                 required
@@ -338,9 +313,10 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
                 <button
                   type="button"
                   onClick={() => removeOption(i)}
-                  className="w-10 h-10 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-100 transition shrink-0"
+                  aria-label={`Supprimer l'option ${i + 1}`}
+                  className="w-10 h-10 rounded-xl bg-red-50 text-red-700 flex items-center justify-center hover:bg-red-100 transition shrink-0"
                 >
-                  <X size={14} />
+                  <X size={14} aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -351,14 +327,14 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
               onClick={addOption}
               className="flex items-center gap-2 px-3 py-2 rounded-xl border border-dashed border-gray-300 text-xs text-gray-500 hover:border-indigo-400 hover:text-indigo-500 transition"
             >
-              <Plus size={13} /> Ajouter une option
+              <Plus size={13} aria-hidden="true" /> Ajouter une option
             </button>
           )}
         </div>
 
         {error && (
-          <p className="text-xs text-red-600 flex items-center gap-1.5">
-            <AlertTriangle size={13} /> {error}
+          <p role="alert" className="text-xs text-red-600 flex items-center gap-1.5">
+            <AlertTriangle size={13} aria-hidden="true" /> {error}
           </p>
         )}
 
@@ -367,7 +343,7 @@ function CreatePollModal({ onClose, onCreate, loading, error }) {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 disabled:opacity-60 transition mt-1"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <><BarChart2 size={15} /> Créer le sondage</>}
+          {loading ? <LoadingSpinner size={16} /> : <><BarChart2 size={15} aria-hidden="true" /> Créer le sondage</>}
         </button>
       </form>
     </Modal>
@@ -386,8 +362,8 @@ function PollCard({ poll, currentUserId, onVote }) {
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-semibold text-gray-900 leading-snug flex-1">{poll.question}</p>
         {isClosed ? (
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-gray-500 text-xs font-medium shrink-0">
-            <Lock size={11} /> Fermé
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium shrink-0">
+            <Lock size={11} aria-hidden="true" /> Fermé
           </span>
         ) : (
           <span className="px-2 py-0.5 rounded-lg bg-green-100 text-green-700 text-xs font-medium shrink-0">Ouvert</span>
@@ -444,7 +420,7 @@ function PollCard({ poll, currentUserId, onVote }) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="flex items-center justify-between text-xs text-gray-600">
         <span>{totalVotes} vote{totalVotes > 1 ? 's' : ''}</span>
         <span>{timeAgo(poll.createdAt)}</span>
       </div>
@@ -494,14 +470,14 @@ function PollsTab({ polls, currentUserId, onVote, onCreate, createLoading, error
             onClick={() => setShowModal(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition"
           >
-            <Plus size={14} /> Créer
+            <Plus size={14} aria-hidden="true" /> Créer
           </button>
         </div>
 
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-            <BarChart2 size={28} className="mx-auto text-gray-300 mb-2" />
-            <p className="text-sm text-gray-400">Aucun sondage {filter === 'open' ? 'ouvert' : filter === 'closed' ? 'fermé' : ''}</p>
+            <BarChart2 size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
+            <p className="text-sm text-gray-600">Aucun sondage {filter === 'open' ? 'ouvert' : filter === 'closed' ? 'fermé' : ''}</p>
           </div>
         ) : (
           filtered.map((poll) => (
@@ -527,7 +503,7 @@ function KarmaTab({ members, currentUserId, onThank }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-2 p-3 rounded-xl bg-purple-50 border border-purple-100 text-purple-700 text-xs">
-        <Sparkles size={14} className="mt-0.5 shrink-0" />
+        <Sparkles size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
         <span>Remerciez un colocataire pour une bonne action — il reçoit <strong>+3 Karma</strong>.</span>
       </div>
 
@@ -540,7 +516,7 @@ function KarmaTab({ members, currentUserId, onThank }) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 truncate">{member.name}</p>
               <div className="flex items-center gap-1 mt-0.5">
-                <Heart size={11} className="text-purple-400" />
+                <Heart size={11} aria-hidden="true" className="text-purple-400" />
                 <span className="text-xs text-purple-600 font-medium">{member.karma_score} karma</span>
               </div>
             </div>
@@ -550,8 +526,8 @@ function KarmaTab({ members, currentUserId, onThank }) {
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 text-purple-600 text-xs font-semibold hover:bg-purple-100 disabled:opacity-50 transition"
             >
               {thankingId === member.id
-                ? <Loader2 size={13} className="animate-spin" />
-                : <><Heart size={13} /> Remercier</>
+                ? <LoadingSpinner size={13} />
+                : <><Heart size={13} aria-hidden="true" /> Remercier</>
               }
             </button>
           </div>
@@ -569,6 +545,7 @@ const TABS = [
 ]
 
 export default function Concordia() {
+  useDocumentTitle('Concordia')
   const [activeTab, setActiveTab] = useState('complaints')
 
   const {
@@ -595,8 +572,9 @@ export default function Concordia() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 px-4 pt-4">
-        {[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
+      <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
+        <span className="sr-only">Chargement en cours</span>
+        {[1, 2, 3].map((i) => <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />)}
       </div>
     )
   }
@@ -610,7 +588,7 @@ export default function Concordia() {
         <div className="bg-white border-b border-gray-100 px-4 pt-10 pb-4">
           <div className="mb-4">
             <h1 className="text-xl font-bold text-gray-900">Concordia</h1>
-            <p className="text-xs text-gray-400 mt-0.5">Social &amp; médiation</p>
+            <p className="text-xs text-gray-600 mt-0.5">Social &amp; médiation</p>
           </div>
 
           {/* Tab bar */}
@@ -621,10 +599,10 @@ export default function Concordia() {
                 onClick={() => setActiveTab(tab.value)}
                 className={clsx(
                   'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all',
-                  activeTab === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  activeTab === tab.value ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-700'
                 )}
               >
-                <tab.Icon size={14} />
+                <tab.Icon size={14} aria-hidden="true" />
                 {tab.label}
               </button>
             ))}

@@ -9,7 +9,7 @@ import {
 } from '../graphql/concordia'
 
 export function useConcordia() {
-  const { user } = useAuthContext()
+  const { user, loading: authLoading } = useAuthContext()
   const colocId = user?.coloc_id
   const currentUserId = user?.id
   const isAdmin = user?.role === 'ADMIN'
@@ -138,7 +138,7 @@ export function useConcordia() {
   const polls      = pollsData?.polls ?? []
 
   return {
-    loading: complaintsLoading || pollsLoading,
+    loading: authLoading || complaintsLoading || pollsLoading,
     createComplaintLoading,
     createPollLoading,
     complaintError,

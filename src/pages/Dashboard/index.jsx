@@ -2,6 +2,7 @@ import { RefreshCw, LogOut, Star, Heart, CheckSquare, AlertTriangle, Bell, Clock
 import { clsx } from 'clsx'
 import { useDashboard } from '../../hooks/useDashboard'
 import { useAuth } from '../../hooks/useAuth'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { useAuthContext } from '../../context/AuthContext'
 import Avatar from '../../components/Avatar'
 
@@ -11,7 +12,7 @@ function ScoreCard({ label, value, icon: Icon, color }) {
   return (
     <div className={clsx('flex-1 rounded-2xl p-4 flex flex-col gap-2', color)}>
       <div className="flex items-center gap-2 opacity-80">
-        <Icon size={14} strokeWidth={2.5} />
+        <Icon size={14} strokeWidth={2.5} aria-hidden="true" />
         <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
       </div>
       <span className="text-3xl font-bold">{value ?? '—'}</span>
@@ -62,7 +63,7 @@ function SectionHeader({ title, count }) {
     <div className="flex items-center justify-between mb-3">
       <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{title}</h2>
       {count !== undefined && (
-        <span className="text-xs font-medium text-gray-400">{count}</span>
+        <span className="text-xs font-medium text-gray-600">{count}</span>
       )}
     </div>
   )
@@ -70,9 +71,10 @@ function SectionHeader({ title, count }) {
 
 function LoadingState() {
   return (
-    <div className="flex flex-col gap-3 px-4 pt-4">
+    <div role="status" aria-live="polite" className="flex flex-col gap-3 px-4 pt-4">
+      <span className="sr-only">Chargement en cours</span>
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
+        <div key={i} aria-hidden="true" className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
       ))}
     </div>
   )
@@ -81,6 +83,7 @@ function LoadingState() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
+  useDocumentTitle('Tableau de bord')
   const { user } = useAuthContext()
   const { logout } = useAuth()
   const {
@@ -101,13 +104,13 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] gap-3 px-6 text-center">
-        <AlertTriangle size={32} className="text-red-400" />
+        <AlertTriangle size={32} aria-hidden="true" className="text-red-400" />
         <p className="text-gray-600 text-sm">Impossible de charger les données.</p>
         <button
           onClick={() => refetch()}
           className="text-indigo-600 text-sm font-medium flex items-center gap-1"
         >
-          <RefreshCw size={14} /> Réessayer
+          <RefreshCw size={14} aria-hidden="true" /> Réessayer
         </button>
       </div>
     )
@@ -121,22 +124,24 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <Avatar name={user?.name ?? ''} size="lg" />
             <div>
-              <p className="text-xs text-gray-400 font-medium">Bonjour,</p>
+              <p className="text-xs text-gray-600 font-medium">Bonjour,</p>
               <h1 className="text-lg font-bold text-gray-900 leading-tight">{user?.name ?? 'Colocataire'}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => refetch()}
+              aria-label="Rafraîchir le tableau de bord"
               className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
-              <RefreshCw size={16} />
+              <RefreshCw size={16} aria-hidden="true" />
             </button>
             <button
               onClick={logout}
+              aria-label="Se déconnecter"
               className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition"
             >
-              <LogOut size={16} />
+              <LogOut size={16} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -172,7 +177,7 @@ export default function Dashboard() {
                     PRIORITY_COLORS[ticket.priority] ?? 'bg-white border-gray-100'
                   )}
                 >
-                  <AlertTriangle size={18} className="shrink-0" />
+                  <AlertTriangle size={18} aria-hidden="true" className="shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{ticket.title}</p>
                     <p className="text-xs opacity-70 mt-0.5">{ticket.category} · {ticket.status}</p>
@@ -191,8 +196,8 @@ export default function Dashboard() {
           <SectionHeader title="Mes tâches" count={myTasks.length} />
           {myTasks.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
-              <CheckSquare size={28} className="mx-auto text-gray-300 mb-2" />
-              <p className="text-sm text-gray-400">Aucune tâche assignée</p>
+              <CheckSquare size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
+              <p className="text-sm text-gray-600">Aucune tâche assignée</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -203,8 +208,8 @@ export default function Dashboard() {
                   </span>
                   <p className="text-sm font-medium text-gray-800 flex-1 min-w-0 truncate">{task.title}</p>
                   {task.due_at && (
-                    <div className="flex items-center gap-1 text-gray-400 shrink-0">
-                      <Clock size={12} />
+                    <div className="flex items-center gap-1 text-gray-600 shrink-0">
+                      <Clock size={12} aria-hidden="true" />
                       <span className="text-xs">{new Date(task.due_at).toLocaleDateString('fr', { day: 'numeric', month: 'short' })}</span>
                     </div>
                   )}
@@ -231,7 +236,7 @@ export default function Dashboard() {
           </div>
           {openComplaints > 0 && (
             <div className="mt-2 flex items-center gap-2 bg-amber-50 border border-amber-100 text-amber-700 rounded-2xl p-3.5">
-              <MessageSquare size={16} className="shrink-0" />
+              <MessageSquare size={16} aria-hidden="true" className="shrink-0" />
               <p className="text-sm font-medium">
                 {openComplaints} plainte{openComplaints > 1 ? 's' : ''} ouverte{openComplaints > 1 ? 's' : ''}
               </p>
@@ -258,8 +263,8 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-xs font-semibold text-gray-500 shrink-0">
-                    <span className="flex items-center gap-1"><Star size={11} className="text-indigo-400" />{member.harmony_score}</span>
-                    <span className="flex items-center gap-1"><Heart size={11} className="text-purple-400" />{member.karma_score}</span>
+                    <span className="flex items-center gap-1"><Star size={11} aria-hidden="true" className="text-indigo-400" />{member.harmony_score}</span>
+                    <span className="flex items-center gap-1"><Heart size={11} aria-hidden="true" className="text-purple-400" />{member.karma_score}</span>
                   </div>
                 </div>
               ))}
@@ -271,8 +276,8 @@ export default function Dashboard() {
           <SectionHeader title="Activité récente" count={notifications.length > 0 ? `${notifications.length}` : undefined} />
           {notifications.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
-              <Bell size={28} className="mx-auto text-gray-300 mb-2" />
-              <p className="text-sm text-gray-400">Aucune activité récente</p>
+              <Bell size={28} aria-hidden="true" className="mx-auto text-gray-300 mb-2" />
+              <p className="text-sm text-gray-600">Aucune activité récente</p>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -281,13 +286,13 @@ export default function Dashboard() {
                   key={notif.id ?? notif._id ?? i}
                   className="bg-white rounded-2xl border border-gray-100 p-3.5 flex items-start gap-3"
                 >
-                  <span className="text-lg leading-none mt-0.5 shrink-0">
+                  <span aria-hidden="true" className="text-lg leading-none mt-0.5 shrink-0">
                     {NOTIF_ICONS[notif.type] ?? '📣'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 leading-snug">{notif.message}</p>
                     {notif.created_at && (
-                      <p className="text-xs text-gray-400 mt-1">{timeAgo(notif.created_at)}</p>
+                      <p className="text-xs text-gray-600 mt-1">{timeAgo(notif.created_at)}</p>
                     )}
                   </div>
                 </div>

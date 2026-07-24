@@ -5,7 +5,7 @@ import { GET_COLOC_DASHBOARD, GET_NOTIFICATIONS } from '../graphql/dashboard'
 import { GET_MAINTENANCE_TICKETS } from '../graphql/maintenance'
 
 export function useDashboard() {
-  const { user } = useAuthContext()
+  const { user, loading: authLoading } = useAuthContext()
   const colocId = user?.coloc_id
   const { notifications: liveNotifications } = useSocket()
 
@@ -59,7 +59,7 @@ export function useDashboard() {
   ].slice(0, 20)
 
   return {
-    loading: dashLoading || notifLoading || maintenanceLoading,
+    loading: authLoading || dashLoading || notifLoading || maintenanceLoading,
     error: dashError,
     refetch: refetchDash,
     dashboard,

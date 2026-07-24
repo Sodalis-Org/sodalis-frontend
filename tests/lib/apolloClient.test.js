@@ -13,38 +13,26 @@ function mockFetchOnce(body) {
   return fetchMock
 }
 
-function authHeaderFrom(fetchMock) {
-  const [, options] = fetchMock.mock.calls[0]
-  const headers = options.headers
-  return headers instanceof Headers ? headers.get('authorization') : headers.authorization
-}
-
 const PING = gql`
   query Ping {
     ping
   }
 `
 
-describe('apolloClient auth link', () => {
+describe('apolloClient', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
-    localStorage.clear()
   })
 
-  it('attaches the bearer token stored in localStorage', async () => {
-    localStorage.setItem('sodalis_token', 'abc.def.ghi')
+  it('sends the httpOnly auth cookie on every request instead of a Bearer header', async () => {
     const fetchMock = mockFetchOnce({ data: { ping: 'pong' } })
 
     await client.query({ query: PING, fetchPolicy: 'no-cache' })
 
-    expect(authHeaderFrom(fetchMock)).toBe('Bearer abc.def.ghi')
-  })
-
-  it('sends an empty authorization header when no token is stored', async () => {
-    const fetchMock = mockFetchOnce({ data: { ping: 'pong' } })
-
-    await client.query({ query: PING, fetchPolicy: 'no-cache' })
-
-    expect(authHeaderFrom(fetchMock)).toBe('')
+    const [, options] = fetchMock.mock.calls[0]
+    expect(options.credentials).toBe('include')
+    const headers = options.headers
+    const authHeader = headers instanceof Headers ? headers.get('authorization') : headers.authorization
+    expect(authHeader).toBeFalsy()
   })
 })
