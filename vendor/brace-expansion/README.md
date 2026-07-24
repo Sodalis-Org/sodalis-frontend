@@ -3,3 +3,6 @@
 Patched release for [GHSA-mh99-v99m-4gvg](https://github.com/advisories/GHSA-mh99-v99m-4gvg)
 with a CommonJS default-export shim (`compat.cjs`) so `minimatch@3` (pulled in by
 eslint plugins) keeps working. Forced via `package.json` `overrides`.
+
+The upstream build lives under `lib/` (not `dist/`) so it is not excluded by the
+root `.gitignore` `dist` rule.

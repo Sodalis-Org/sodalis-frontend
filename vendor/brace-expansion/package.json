@@ -8,11 +8,11 @@
     "./package.json": "./package.json",
     ".": {
       "import": {
-        "types": "./dist/esm/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "types": "./lib/esm/index.d.ts",
+        "default": "./lib/esm/index.js"
       },
       "require": {
-        "types": "./dist/commonjs/index.d.ts",
+        "types": "./lib/commonjs/index.d.ts",
         "default": "./compat.cjs"
       },
       "default": "./compat.cjs"
