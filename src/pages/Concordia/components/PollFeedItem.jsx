@@ -1,14 +1,30 @@
+import { useState } from 'react'
 import { clsx } from 'clsx'
-import { Lock, Check } from 'lucide-react'
+import { Lock, Check, Loader2 } from 'lucide-react'
 import Avatar from '../../../components/Avatar'
 import { timeAgo } from '../../../lib/time'
 
 export default function PollFeedItem({ poll, members, currentUserId, isAdmin, onVote, onClose }) {
+  const [votingOptionId, setVotingOptionId] = useState(null)
+  const [voteError, setVoteError] = useState(null)
+
   const creator     = members.find((m) => m.id === poll.creator_id)
   const totalVotes  = poll.options.reduce((sum, o) => sum + o.voters.length, 0)
   const isClosed    = poll.status === 'CLOSED'
   const winnerCount = Math.max(...poll.options.map((o) => o.voters.length))
   const canClose    = !isClosed && (isAdmin || poll.creator_id === currentUserId)
+  const isVoting    = votingOptionId !== null
+
+  const handleVote = async (optionId) => {
+    if (isClosed || isVoting) return
+    setVoteError(null)
+    setVotingOptionId(optionId)
+    const result = await onVote(poll.id, optionId)
+    setVotingOptionId(null)
+    if (!result?.ok) {
+      setVoteError(result?.error ?? 'Impossible d\'enregistrer votre vote.')
+    }
+  }
 
   return (
     <div className="bg-card rounded-2xl border border-border p-4 flex flex-col gap-3">
@@ -31,11 +47,12 @@ export default function PollFeedItem({ poll, members, currentUserId, isAdmin, on
           return (
             <button
               key={option.option_id}
-              onClick={() => !isClosed && onVote(poll.id, option.option_id)}
-              disabled={isClosed}
+              onClick={() => handleVote(option.option_id)}
+              disabled={isClosed || isVoting}
+              aria-busy={votingOptionId === option.option_id}
               className={clsx(
                 'relative w-full text-left rounded-full overflow-hidden border px-3.5 py-2.5 transition',
-                isClosed ? 'cursor-default' : 'hover:border-primary/40 active:scale-[0.99]',
+                isClosed || isVoting ? 'cursor-default' : 'hover:border-primary/40 active:scale-[0.99]',
                 isMyVote ? 'border-primary/50' : isWinner ? 'border-accent/60' : 'border-border',
               )}
             >
@@ -48,7 +65,11 @@ export default function PollFeedItem({ poll, members, currentUserId, isAdmin, on
               )}
               <div className="relative flex items-center justify-between gap-2">
                 <span className={clsx('flex items-center gap-1.5 text-sm font-medium', isMyVote ? 'text-primary' : isWinner ? 'text-accent-foreground' : 'text-foreground')}>
-                  {(isMyVote || isWinner) && <Check size={14} aria-hidden="true" className={isMyVote ? 'text-primary shrink-0' : 'text-accent-foreground shrink-0'} />}
+                  {votingOptionId === option.option_id ? (
+                    <Loader2 size={14} aria-hidden="true" className="animate-spin shrink-0 text-primary" />
+                  ) : (isMyVote || isWinner) ? (
+                    <Check size={14} aria-hidden="true" className={isMyVote ? 'text-primary shrink-0' : 'text-accent-foreground shrink-0'} />
+                  ) : null}
                   {option.text}
                 </span>
                 <span className={clsx('text-xs font-semibold shrink-0', isMyVote ? 'text-primary' : 'text-muted-foreground')}>
@@ -59,6 +80,10 @@ export default function PollFeedItem({ poll, members, currentUserId, isAdmin, on
           )
         })}
       </div>
+
+      {voteError && (
+        <p role="alert" className="text-xs text-destructive font-medium">{voteError}</p>
+      )}
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>

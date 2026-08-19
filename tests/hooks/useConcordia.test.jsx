@@ -153,9 +153,11 @@ describe('useConcordia', () => {
     const { result } = renderHook(() => useConcordia(), { wrapper: makeWrapper(mocks) })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
+    let voteResult
     await act(async () => {
-      await result.current.votePoll('p1', 'o1')
+      voteResult = await result.current.votePoll('p1', 'o1')
     })
+    expect(voteResult).toEqual({ ok: true })
     await act(async () => {
       await result.current.resolveComplaint('cp1')
     })
@@ -192,5 +194,25 @@ describe('useConcordia', () => {
     })
 
     expect(result.current.karmaFeedback).toEqual({ name: 'Bob', score: 42 })
+  })
+
+  it('votePoll returns ok:false when the mutation fails', async () => {
+    const mocks = [
+      ...baseMocks(),
+      {
+        request: { query: VOTE_POLL, variables: { poll_id: 'p1', option_id: 'o1' } },
+        error: new Error('Poll is closed'),
+      },
+    ]
+    const { result } = renderHook(() => useConcordia(), { wrapper: makeWrapper(mocks) })
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let voteResult
+    await act(async () => {
+      voteResult = await result.current.votePoll('p1', 'o1')
+    })
+
+    expect(voteResult.ok).toBe(false)
+    expect(voteResult.error).toBe('Poll is closed')
   })
 })

@@ -139,8 +139,10 @@ export function useConcordia() {
   const votePoll = async (poll_id, option_id) => {
     try {
       await votePollMutation({ variables: { poll_id, option_id } })
+      return { ok: true }
     } catch (e) {
-      console.error(e)
+      const error = e.graphQLErrors?.[0]?.message ?? e.message ?? 'Impossible d\'enregistrer votre vote.'
+      return { ok: false, error }
     }
   }
 
