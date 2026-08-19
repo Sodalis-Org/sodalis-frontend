@@ -16,6 +16,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et ce pr
 
 ## [Non publié]
 
+## [1.1.0] - 2026-08-19
+
+Version mineure : chantier accessibilité RGAA 4.1 (100 % sur le périmètre retenu) + correctif support utilisateur ANM-10.
+
 ### Added
 
 - Composants partagés `InputField`, `SelectField`, `Modal`, `LoadingSpinner` dans `src/components/`
@@ -36,6 +40,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et ce pr
   panneau de notifications, contrastes de texte et de badges relevés au-dessus du seuil WCAG AA,
   titre de page distinct par route, lien d'évitement vers le contenu principal, annonce des états
   de chargement aux technologies d'assistance, icônes décoratives masquées.
+- **ANM-10** (support utilisateur) : vote sur sondage — spinner pendant la mutation et message
+  d'erreur accessible (`role="alert"`) si la mutation échoue (ex. sondage fermé entre-temps).
+  PR #14, test NR `votePoll returns ok:false when the mutation fails`.
 
 ### Changed
 
