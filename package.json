@@ -59,6 +59,7 @@
   "overrides": {
     "tmp": "^0.2.7",
     "uuid": "^11.1.1",
-    "brace-expansion": "file:vendor/brace-expansion"
+    "brace-expansion": "file:vendor/brace-expansion",
+    "@puppeteer/browsers": "^3.2.1"
   }
 }

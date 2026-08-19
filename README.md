@@ -75,3 +75,7 @@ Chaque route sous `/`, `/chores`, `/concordia`, `/profile` est protégée par `P
 
 Le fichier `APIDOCUMENTATION.md` à la racine du repo est la référence (queries/mutations, enums, erreurs, events Socket.io).
 
+## Support utilisateur
+
+Un problème en utilisant Sodalis ? Les signalements passent par le dépôt backend : [`SUPPORT.md`](https://github.com/Sodalis-Org/sodalis-backend/blob/main/SUPPORT.md) (formulaire GitHub ou e-mail).
+
